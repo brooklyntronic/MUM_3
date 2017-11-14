@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AD_UNIT_ID_FOR_BANNER_TEST</key>
+	<string>ca-app-pub-3940256099942544/2934735716</string>
+	<key>AD_UNIT_ID_FOR_INTERSTITIAL_TEST</key>
+	<string>ca-app-pub-3940256099942544/4411468910</string>
+	<key>CLIENT_ID</key>
+	<string>428550214762-n11ctrkrgci3u2lubgfbruos30b0kn57.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.428550214762-n11ctrkrgci3u2lubgfbruos30b0kn57</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBzxpNt86Tw1raYKDLfaL5HtNEhhtid1II</string>
+	<key>GCM_SENDER_ID</key>
+	<string>428550214762</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>org.reactjs.native.example.MatchupMatchApp-3</string>
+	<key>PROJECT_ID</key>
+	<string>matchup-match</string>
+	<key>STORAGE_BUCKET</key>
+	<string>matchup-match.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<true></true>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<false></false>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:428550214762:ios:de30fee69420f55c</string>
+	<key>DATABASE_URL</key>
+	<string>https://matchup-match.firebaseio.com</string>
+</dict>
+</plist>

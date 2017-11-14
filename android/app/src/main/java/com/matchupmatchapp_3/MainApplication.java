@@ -3,6 +3,15 @@ package com.matchupmatchapp_3;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
+import com.horcrux.svg.SvgPackage;
+import com.inprogress.reactnativeyoutube.ReactNativeYouTube;
+import com.airbnb.android.react.maps.MapsPackage;
+import com.github.yamill.orientation.OrientationPackage;
+import com.oney.WebRTCModule.WebRTCModulePackage;
+import com.zxcpoiu.incallmanager.InCallManagerPackage;
+import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
+import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.i18n.reactnativei18n.ReactNativeI18n;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.facebook.react.ReactNativeHost;
@@ -25,6 +34,15 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new ReactNativePushNotificationPackage(),
+            new SvgPackage(),
+            new ReactNativeYouTube(),
+            new MapsPackage(),
+            new OrientationPackage(),
+            new WebRTCModulePackage(),
+            new InCallManagerPackage(),
+            new ReactNativeConfigPackage(),
+            new PickerPackage(),
             new ReactNativeI18n(),
             new VectorIconsPackage()
       );

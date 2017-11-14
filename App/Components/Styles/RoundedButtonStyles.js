@@ -8,7 +8,8 @@ export default StyleSheet.create({
     marginHorizontal: Metrics.section,
     marginVertical: Metrics.baseMargin,
     backgroundColor: Colors.fire,
-    justifyContent: 'center'
+    justifyContent: 'center',
+    paddingHorizontal: 10
   },
   buttonText: {
     color: Colors.snow,

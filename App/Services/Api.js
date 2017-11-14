@@ -1,8 +1,12 @@
 // a library to wrap and simplify api calls
 import apisauce from 'apisauce'
-
+import Utilities from './Utilities'
+import axios from 'axios'
+// import Config from 'react-native-config'
+// import Reactotron from 'reactotron-react-native'
 // our "constructor"
-const create = (baseURL = 'https://api.github.com/') => {
+
+const create = (baseURL = Utilities.baseUrl) => {
   // ------
   // STEP 1
   // ------
@@ -10,17 +14,14 @@ const create = (baseURL = 'https://api.github.com/') => {
   // Create and configure an apisauce-based api object.
   //
   const api = apisauce.create({
-    // base URL is read from the "constructor"
-    baseURL,
-    // here are some default headers
+    baseURL: Utilities.baseUrl,
     headers: {
-      'Cache-Control': 'no-cache'
+      'Cache-Control': 'no-cache',
     },
     // 10 second timeout...
-    timeout: 10000
+    timeout: 20000
   })
-
-  // ------
+  // ------ 
   // STEP 2
   // ------
   //
@@ -33,11 +34,50 @@ const create = (baseURL = 'https://api.github.com/') => {
   //
   // Since we can't hide from that, we embrace it by getting out of the
   // way at this level.
-  //
-  const getRoot = () => api.get('')
-  const getRate = () => api.get('rate_limit')
-  const getUser = (username) => api.get('search/users', {q: username})
 
+  // Matchups
+  const setHeader = (accessToken) => api.setHeader('Authorization', accessToken)
+  const getS3Policy = (type) => api.get('api/s3Policy?mimeType=' + type)
+  const putInS3 = (file, key) => api.post('api/putInS3', {file, key})
+  const getNotifications = () => api.get('notifications')
+  const getMatchups = () => api.get('matchups')
+  const getMyMatchups = () => api.get('myMatchups')
+  const getMatchup = (matchupId) => api.get('matchups/'+matchupId)
+  const createMatchup = (matchup) => api.post('matchups', JSON.stringify(matchup))
+  const voteOnMatchup = (vote, matchupId) => api.post('users/votes',JSON.stringify({
+          'date': new Date().getTime(),
+          'vote': vote,
+          'matchup': matchupId
+        }))
+  const getVotes = () =>api.get('users/votes')
+  const addPhoto = (key) => api.post('users/photos', {photo: key})
+  
+  const inviteMatchesToMatchup = (list, matchup) => api.post('inviteToMatchup', JSON.stringify({list:list, matchup: matchup}))
+  const unfriend = (friendId) => api.post('users/unfriend', JSON.stringify({friend: friendId}))
+  // User
+  const createUser = (user) => api.post('users/create', JSON.stringify({user}))
+  const logInUser = (idToken) => api.post('users/session', JSON.stringify({token: idToken}))
+  const checkLogin = () => api.get('users/loggedIn')
+  const getPreferences = () => api.get('getPreferences')
+  const editProfile = (user) => api.post('users/editProfile', JSON.stringify({user}))
+  const getMatches = () => api.get('users/matches')
+  const getRequests = () => api.get('users/matchRequests')
+  const friendRequest = (_id) => api.post('users/profile/request', JSON.stringify({_id}))
+  const acceptRequest = (friend) => api.post('users/addfriend', JSON.stringify({friend}))
+  const denyRequest = (friend) => api.post('users/profile/denyRequest', JSON.stringify({friend}))
+  const getProfile = (userId) => api.get('users/profile/' + userId )
+  const getMyProfile = () => api.get('getMyProfile')
+  const makeMyAvatar = (photo) => api.post('users/avatar', {avatar: photo})
+  const deletePhoto = (photo) => api.post('users/photos/delete', {pic: photo})
+  const getMatchesByPreference = () => api.get('byPreferences')
+  const getMatchesByMatchups = () => api.get('byVotes')
+
+  // Messages
+  const saveMessages = (messages, id)=>api.post('saveMessages', {messages, id})
+  const getMessages = ()=> api.get('newMessages')
+  const getMessageThread = (id)=>api.get('newMessageThread/' + id)
+  const deleteMessageThread = (id)=> api.post('deleteNewMessage', {id})
+  const postMessage = (message)=> api.post('newMessages', message)
   // ------
   // STEP 3
   // ------
@@ -52,9 +92,40 @@ const create = (baseURL = 'https://api.github.com/') => {
   //
   return {
     // a list of the API functions from step 2
-    getRoot,
-    getRate,
-    getUser
+    setHeader,
+    getS3Policy,
+    putInS3,
+    getNotifications,
+    getMatchups,
+    getMyMatchups,
+    getMatchup,
+    getVotes,
+    createMatchup,
+    inviteMatchesToMatchup,
+    makeMyAvatar,
+    createUser,
+    getPreferences,
+    getMyProfile,
+    addPhoto,
+    deletePhoto,
+    editProfile,
+    getMatches,
+    getRequests,
+    friendRequest,
+    acceptRequest,
+    denyRequest,
+    unfriend,
+    getProfile,
+    voteOnMatchup,
+    logInUser,
+    checkLogin,
+    getMatchesByPreference,
+    getMatchesByMatchups,
+    getMessages,
+    saveMessages,
+    getMessageThread,
+    deleteMessageThread,
+    postMessage
   }
 }
 

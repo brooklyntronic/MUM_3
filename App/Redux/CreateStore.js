@@ -13,9 +13,10 @@ export default (rootReducer, rootSaga) => {
   const middleware = []
   const enhancers = []
 
+  /* ------------- Async Middleware ------------------*/
   /* ------------- Analytics Middleware ------------- */
   middleware.push(ScreenTracking)
-
+  
   /* ------------- Saga Middleware ------------- */
 
   const sagaMonitor = Config.useReactotron ? console.tron.createSagaMonitor() : null
@@ -43,11 +44,7 @@ export default (rootReducer, rootSaga) => {
   }
 
   // kick off root saga
-  let sagasManager = sagaMiddleware.run(rootSaga)
+  sagaMiddleware.run(rootSaga)
 
-  return {
-    store,
-    sagasManager,
-    sagaMiddleware
-  }
+  return store
 }
