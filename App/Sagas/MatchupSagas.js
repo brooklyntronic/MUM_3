@@ -4,23 +4,43 @@ import MatchupActions from '../Redux/MatchupRedux'
 import UserActions from '../Redux/UserRedux'
 import {NavigationActions} from 'react-navigation'
 import s3 from '../Services/S3'
+// import Reactotron from 'reactotron-react-native'
+// import API from '../Services/Api'
+import Utilities from '../Services/Utilities'
+
 export function * matchups (api, action) {
   // make the call to the api
-  const response = yield call(api.getMatchups)
+  const {response, myResponse, inviteResponse } = yield all({
+    response: call(api.getMatchups),
+    myResponse: call(api.getMyMatchups),
+    inviteResponse: call(api.getInvitedMatchups)
+  })
   if (response.ok) {
-  	const myResponse = yield call(api.getMyMatchups)
-  	if (myResponse.ok) {
-  		yield put(MatchupActions.myListSuccess(myResponse.data))  
-  	} else {
-  		yield put(MatchupActions.myListFailure(myResponse.error))
-  	}
   	yield put(MatchupActions.listSuccess(response.data))
-
   } else {
   	yield put(MatchupActions.listFailure(response.error))
   }
+  if (myResponse.ok) {
+    yield put(MatchupActions.myListSuccess(myResponse.data))  
+  } else {
+    yield put(MatchupActions.myListFailure(myResponse.error))
+  }
+  if (inviteResponse.ok) {
+    yield put(MatchupActions.myInviteSuccess(inviteResponse.data))  
+  } else {
+    yield put(MatchupActions.myInviteFailure(inviteResponse.error))
+  }
+  
 }
 
+export function * invited_matchups (api, action) {
+  const inviteResponse = yield call(api.getInvitedMatchups)
+  if (inviteResponse.ok) {
+    yield put(MatchupActions.myInviteSuccess(inviteResponse.data))  
+  } else {
+    yield put(MatchupActions.myInviteFailure(inviteResponse.error))
+  }
+}
 export function * get_votes (api, action) {
   const response = yield call(api.getVotes)
   if(response.ok){
@@ -37,7 +57,7 @@ export function * vote_matchup (api, action) {
   if (response.ok) {
     yield put(UserActions.searchMatchesPreferenceAttempt())
     yield put(UserActions.searchMatchesVoteAttempt())
-  	const {searchResponse, voteResponse, matchupResponse, getVotesResponse } = yield all({
+    const {searchResponse, voteResponse, matchupResponse, getVotesResponse } = yield all({
       searchResponse: call(api.getMatchesByPreference),
       voteResponse: call(api.getMatchesByMatchups),
       getVotesResponse: call(api.getVotes),
@@ -61,65 +81,81 @@ export function * vote_matchup (api, action) {
     if (matchupResponse.ok && getVotesResponse.ok){
       yield put(MatchupActions.voteSuccess(matchupResponse.data, getVotesResponse.data))
     } else {
-    yield put(MatchupActions.voteFailure('Error'))
-  }
+      yield put(MatchupActions.voteFailure('Error'))
+    }
   } else {
   	yield put(MatchupActions.voteFailure(response.error))
   }
 }
 
-function * gets3Creds (api, file) {
-
-  yield call(api.getS3Policy, file.type)
-
-
+function pollTranscoder(jobId, api){
+  return Utilities.pollTranscoder(jobId, function() {
+    return api.pollTranscoder(jobId);
+  }, 3000)
 }
-export function * create_matchup (api, s3, action) {
 
+export function * create_matchup (api, s3, action) {
+  let hasError = false
   const {matchup} = action
 
-  const tempArray = yield all(matchup.sides.map((side)=>{
+  yield put(NavigationActions.navigate({ routeName: 'MatchupListScreen' }))
+  const tempArray = yield all(matchup.sides.filter((side)=>side.mediaType === 'vid' || side.mediaType ==='pic').map((side)=>{
+    return call(api.getS3Policy, side.mime)
+  }))
+  if(tempArray.filter(policy=>policy.status !== 200).length > 0){
+    hasError = true
+  }
+  if(tempArray.length > 0 && !hasError){
 
-    if (side.mediaType !=='y'){
+    const uploadArray = yield all(tempArray.map((policy, i)=>{
+      return call(s3.putInS3, policy.data, matchup.sides[i].file)
+    }))
+    // Reactotron.log(uploadArray)
+    const transcodeArray = yield all(matchup.sides.filter((side)=>side.mediaType === 'vid').map((side, i)=>{
+      return call(api.transcodeVideo, side.file.name)
+    }))
+    // Reactotron.log(transcodeArray)
+    if(transcodeArray.length > 0){
+      const pollArray = yield all(transcodeArray.map((transcode, i)=>{
+        // Reactotron.log(call(pollTranscoder, transcode.data))
+        return call(pollTranscoder, transcode.data, api)
+      }))
+      if(pollArray.filter((poll)=>poll.status !== 200).length > 0){
 
-      let file = {body: side.data, type: side.mime}
+        yield put(MatchupActions.createMatchupFailure('Transcode Error'))
 
-      side.data = null;
-
-      side.imageUrl = null;
-
-      side.mime = null;
-
-      return call(s3.putInS3, file, side.image)
-
-    } else {
-
-      return {ok: true}
-
+        hasError = true
+        
+      }
+      
     }
 
-  }))
-  
-  if (typeof(tempArray.find((obj)=>!obj.ok)) === 'undefined'){
-
+  } 
+  if(!hasError){
     const response = yield call(api.createMatchup, {matchup})
-    
+
     if (response.ok) {
 
       yield put(MatchupActions.createMatchupSuccess(response.data))
 
-      yield put(NavigationActions.navigate({ routeName: 'MatchupListScreen' }))
+      myMatchupsResponse = yield call(api.getMyMatchups)
+
+      if (myMatchupsResponse.ok) {
+
+        yield put(MatchupActions.myListSuccess(myMatchupsResponse.data))
+
+      } else {
+
+        yield put(MatchupActions.myListFailure('Error'))
+
+      }
+
 
     } else {
 
       yield put(MatchupActions.createMatchupFailure(response.error))
 
     }
-
-  } else {
-
-    yield put(MatchupActions.createMatchupFailure('Upload Error'))
-
   }
 
 }
@@ -128,14 +164,43 @@ export function * create_matchup (api, s3, action) {
 export function * get_matchup (api, action) {
   // make the call to the api
   const {matchupId} = action
+  
   const response = yield call(api.getMatchup, matchupId)
+  
   if (response.ok) {
 
   	yield put(MatchupActions.getMatchupSuccess(response.data))
 
+
+    const {invitedResponse, notificationResponse} = yield all({
+      invitedResponse: call(api.getInvitedMatchups),
+      notificationResponse: call(api.getNotifications)
+    })
+    
+    if (notificationResponse.ok){
+
+      yield put(UserActions.notificationsSuccess({messages: notificationResponse.data.messageNotifications, requests: notificationResponse.data.friendNotifications,  matchups: notificationResponse.data.matchupNotifications}))
+
+    } else {
+
+      yield put(UserActions.notificationsFailure(notificationResponse.error))
+
+    }
+
+    if (invitedResponse.ok) {
+
+      yield put(MatchupActions.myInviteSuccess(invitedResponse.data))  
+
+    } else {
+
+      yield put(MatchupActions.myInviteFailure(invitedResponse.error))
+
+    }
+
   } else {
-  	yield put(MatchupActions.getMatchupFailure(response.error))
-  }
+
+   yield put(MatchupActions.getMatchupFailure(response.error))
+
+ }
+
 }
-
-

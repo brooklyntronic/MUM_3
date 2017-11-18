@@ -1,4 +1,4 @@
-import { takeLatest, all } from 'redux-saga/effects'
+import { takeLatest, all, takeEvery } from 'redux-saga/effects'
 import API from '../Services/Api'
 import FixtureAPI from '../Services/FixtureApi'
 import DebugConfig from '../Config/DebugConfig'
@@ -14,7 +14,7 @@ import { MessagesTypes } from '../Redux/MessagesRedux'
 import { FileTypes } from '../Redux/FileRedux'
 /* ------------- Sagas ------------- */
 import { create_user, login, check_login, get_preferences, edit_preference, edit_location_preference, edit_location_profile, edit_my_profile, get_profile, get_my_profile, change_avatar, delete_photo, invite_to_matchup, create_preferences, create_profile, search_matches_preference, send_friend_request, send_friend_request_list, receive_friend_request, accept_friend_request, deny_friend_request, added_friend_request, unfriend, get_notifications, upload_photo } from './UserSagas'
-import { matchups, vote_matchup, get_matchup, create_matchup, get_votes} from './MatchupSagas'
+import { matchups, vote_matchup, get_matchup, create_matchup, get_votes, invited_matchups} from './MatchupSagas'
 import { get_all_messages, get_message_thread, post_message, delete_message_thread, save_messages, make_call, accept_call, receive_call, hang_call } from './MessagesSagas'
 /* ------------- API ------------- */
 
@@ -58,10 +58,11 @@ export default function * root () {
     takeLatest(UserTypes.NOTIFICATIONS_ATTEMPT, get_notifications, api),
     //Matchups
     takeLatest(MatchupTypes.LIST_ATTEMPT, matchups, api),
+    takeLatest(MatchupTypes.MY_INVITE_ATTEMPT, invited_matchups, api),
     takeLatest(MatchupTypes.VOTE_ATTEMPT, vote_matchup, api),
     takeLatest(MatchupTypes.GET_MATCHUP_ATTEMPT, get_matchup, api),
     takeLatest(MatchupTypes.CREATE_MATCHUP_ATTEMPT, create_matchup, api, s3),
-    takeLatest(MatchupTypes.INVITE_TO_MATCHUP_ATTEMPT, invite_to_matchup, api),
+    takeLatest(UserTypes.INVITE_TO_MATCHUP_ATTEMPT, invite_to_matchup, api),
 
     //Messages
     takeLatest(MessagesTypes.MESSAGES_ATTEMPT_ALL, get_all_messages, api),

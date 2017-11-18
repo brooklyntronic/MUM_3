@@ -3,6 +3,8 @@ package com.matchupmatchapp_3;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.RNFetchBlob.RNFetchBlobPackage;
+import com.brentvatne.react.ReactVideoPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.horcrux.svg.SvgPackage;
 import com.inprogress.reactnativeyoutube.ReactNativeYouTube;
@@ -34,6 +36,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNFetchBlobPackage(),
+            new ReactVideoPackage(),
             new ReactNativePushNotificationPackage(),
             new SvgPackage(),
             new ReactNativeYouTube(),

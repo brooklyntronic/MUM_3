@@ -22,5 +22,7 @@ export default StyleSheet.create({
   		width: Metrics.screenWidth * .8,
     	...ApplicationStyles.screen.centered,
     	padding: 10
-    }
+    },
+  editAvatar: {backgroundColor: '#000', padding: 5, opacity: .5, borderRadius: 3},
+  editAvatarContainer: {flexDirection: 'row', position: 'absolute', top: 0, left: 5, zIndex: 100}
 })

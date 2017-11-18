@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { ActivityIndicator, View, Text, Dimensions, TouchableOpacity, AsyncStorage, ScrollView, ImageBackground} from 'react-native'
+import { ActivityIndicator, View, Text, Dimensions, TouchableOpacity, ScrollView, ImageBackground} from 'react-native'
 import Image from 'react-native-image-progress'
 import { connect } from 'react-redux'
 import {Images, Colors} from '../Themes'
@@ -7,6 +7,7 @@ import Addicon from '../Components/Addicon'
 import SearchBar from '../Components/SearchBar'
 import PageHeader from '../Components/PageHeader'
 import FullButton from '../Components/FullButton'
+import RoundedButton from '../Components/RoundedButton'
 import Icon from 'react-native-vector-icons/FontAwesome'
 // Styles
 import styles from './Styles/MatchupListScreenStyle'
@@ -36,7 +37,7 @@ class MatchupListScreen extends Component {
   componentDidMount() {
     if(!this.props.loaded){
         this.props.getList()
-        this.props.getMyList()
+        // this.props.getMyList()
       }
   }
   openMatchupScreen (matchid, vote, index, matchup){
@@ -44,8 +45,8 @@ class MatchupListScreen extends Component {
     this.props.openMatchup(matchup)
     this.props.navigation.navigate('MatchupScreen', {id: matchid, voteParam, fromList: this.props.listShown, index: index})
   }
-  toggleMatchups () {
-    this.props.toggleMatchups(!this.props.isPublic)
+  toggleMatchups (val) {
+    this.props.toggleMatchups(val)
   }
   swipe(targetIndex) {
       const currentIndex = this.props.index || 0;
@@ -53,7 +54,7 @@ class MatchupListScreen extends Component {
       this.swiper.scrollBy(offset);
   }
   render() {
-    let listShown = this.props.isPublic ? this.props.matchups : this.props.myMatchups
+    let listShown = this.props[this.props.listShown]
     if (this.props.isLoading) {
       return (
         <View style={styles.mainContainer}>
@@ -68,7 +69,7 @@ class MatchupListScreen extends Component {
       <Addicon onPress={()=>this.props.navigation.navigate('MatchupCreateScreen')}/>
       <View style = {styles.mainContainer}>
       <View style={styles.sliderWrapper}>
-      {listShown.length > 0 ?<Swiper showsButtons={true} showsPagination={false} ref={component => this.swiper = component} index={this.state.index}>
+      {listShown.length > 0 ?<Swiper showsButtons={true} showsPagination={false} ref={component => this.swiper = component}>
             {listShown.map((matchup, i)=>{
               return( 
                 <TouchableOpacity key={matchup._id} onPress={()=>this.openMatchupScreen(matchup.prettyUrl, this.alreadyVoted(matchup._id), listShown.indexOf(matchup), matchup)} style={styles.centered} >
@@ -85,7 +86,10 @@ class MatchupListScreen extends Component {
 
     </View>
     <View style={styles.formContainer}>
-    <FullButton text={this.props.isPublic ?'Go To My Matchups': 'Go To Public Matchups'} onPress={()=>{this.toggleMatchups()}}/></View>
+    {this.props.listShown !== 'myMatchupList' ? <FullButton text='Go To My Matchups' onPress={()=>{this.toggleMatchups('myMatchupList')}}/> : null}
+    {this.props.listShown !== 'matchupList' ?<FullButton text='Go To Public Matchups' onPress={()=>{this.toggleMatchups('matchupList')}}/> : null}
+    {this.props.listShown !== 'invitedList' && this.props.invitedList.length > 0 ? <RoundedButton text={`Invited Matchups ${this.props.invitedList.length}`} onPress={()=>{this.toggleMatchups('invitedList')}}/> : null}
+    </View>
     </ScrollView>
 
     );
@@ -95,14 +99,15 @@ class MatchupListScreen extends Component {
 const mapStateToProps = (state) => {
   return {
     sideVotes: state.matchups.sideVotes,
-    matchups: state.matchups.matchupList, 
+    matchupList: state.matchups.matchupList, 
     isLoading: state.matchups.fetching,
-    myMatchups: state.matchups.myMatchupList,
+    myMatchupList: state.matchups.myMatchupList,
+    invitedList: state.matchups.invitedList,
     listShown: state.matchups.listShown,
     publicMatchups: state.matchups.publicMatchups,
     index: state.matchups.index,
     loaded: state.matchups.matchupsLoaded && state.matchups.myMatchupsLoaded,
-    isPublic: state.matchups.listShown ==='public'? true: false
+    // isPublic: state.matchups.listShown ==='public'? true: false
   }
 }
 
@@ -112,7 +117,7 @@ const mapDispatchToProps = (dispatch) => {
       dispatch(MatchupActions.listAttempt())
     },
     toggleMatchups: (val)=>{
-      dispatch({type: 'SWITCH_LISTS', showPublic: val})
+      dispatch({type: 'SWITCH_LISTS', listShown: val})
     },
     getMyList: ()=>{
       dispatch(MatchupActions.myListAttempt())

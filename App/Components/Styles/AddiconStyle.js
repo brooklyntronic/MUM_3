@@ -5,8 +5,9 @@ export default StyleSheet.create({
     flex: 1
   },
   addMatchup:{
-  position: 'absolute',
-  right: 5,
-  zIndex: 10
+  width: '100%',
+  flexDirection: 'row',
+  justifyContent: 'flex-end',
+  paddingRight: 5
 },
 })

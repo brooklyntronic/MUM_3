@@ -91,6 +91,7 @@ renderPhoneNumberInput() {
   <View style={{ padding: 25 }}>
   <Text>Enter phone number:</Text>
   <TextInput
+  returnKeyType ='done'
   autoFocus
   keyboardType='phone-pad'
   style={{ height: 40, marginTop: 15, marginBottom: 15 }}
@@ -116,6 +117,7 @@ renderVerificationCodeInput() {
     <View style={{ marginTop: 25, padding: 25 }}>
     <Text style={[styles.heading,{textAlign: 'center'}]}>Enter verification code below:</Text>
     <TextInput
+    returnKeyType ='done'
     autoFocus
     style={{ height: 40, marginTop: 15, marginBottom: 0, padding: 0, display: 'none' }}
     onChangeText={value => this.checkCode(value )}
@@ -163,10 +165,10 @@ render() {
   return (
     <ScrollView style={styles.mainScroll}>
     <View style={styles.mainContainer}>
-
+    {this.props.error ? <Animatable.View animation="pulse" easing="ease-out" iterationCount="infinite" style={styles.padding}><Text style={styles.heading}>{this.props.error}</Text></Animatable.View>:null}
     {!user && !confirmResult && this.renderPhoneNumberInput()}
     {!user && confirmResult && this.renderVerificationCodeInput()}
-    {this.props.error ? <Animatable.View animation="pulse" easing="ease-out" iterationCount="infinite" style={styles.padding}><Text style={styles.heading}>{this.props.error}</Text></Animatable.View>:null}
+    
     {user && (
       <View style={styles.content}>
       <ActivityIndicator/>
@@ -179,7 +181,7 @@ render() {
 }
 const mapStateToProps = (state) => {
   return {
-    fetching: state.user.createUserFetching,
+    fetching: state.user.createUserFetching || state.user.fetching,
     error: state.user.error
   }
 }

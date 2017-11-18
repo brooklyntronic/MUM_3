@@ -12,6 +12,18 @@ export default StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		paddingHorizontal: Metrics.baseMargin
+	},
+	navIcon: {
+		color: 'grey',
+		shadowOpacity: 0.75,
+        shadowColor: '#000',
+        shadowOffset: { height: 0, width: 0 }
+	},
+	navIconSelected: {
+		color: '#add8e6',
+		shadowOpacity: 0.75,
+        shadowColor: '#000',
+        shadowOffset: { height: 0, width: 0 }
 	}
 	
 })

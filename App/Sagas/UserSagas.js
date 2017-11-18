@@ -52,7 +52,7 @@ export function * create_user (api, action) {
 
       if (notificationResponse.ok){
 
-        yield put(UserActions.notificationsSuccess({messages: notificationResponse.data.messageNotifications, requests: notificationResponse.data.friendNotifications}))
+        yield put(UserActions.notificationsSuccess({messages: notificationResponse.data.messageNotifications, requests: notificationResponse.data.friendNotifications, matchups: notificationResponse.data.matchupNotifications}))
       } else {
         yield put(UserActions.notificationsFailure('Error'))
       }
@@ -339,6 +339,9 @@ export function * invite_to_matchup (api, action) {
   const response = yield call(api.inviteMatchesToMatchup, action.matchList, action.matchId)
   if (response.ok) {
     yield put(UserActions.inviteToMatchupSuccess(response.data))
+    action.matchList.forEach((match)=>{
+      action.socket.emit('invite_user', match._id, action.myId, action.matchId )
+    })
   } else {
     yield put(UserActions.inviteToMatchupFailure(response.error))
   }
@@ -468,7 +471,7 @@ export function * unfriend_request (api, action) {
 export function * get_notifications (api, action) {
   const response = yield call(api.getNotifications)
   if (response.ok){
-    yield put(UserActions.notificationsSuccess({messages: response.data.messageNotifications, requests: response.data.friendNotifications}))
+    yield put(UserActions.notificationsSuccess({messages: response.data.messageNotifications, requests: response.data.friendNotifications,  matchups: notificationResponse.data.matchupNotifications}))
   } else {
     yield put(UserActions.notificationsFailure(response.error))
   }

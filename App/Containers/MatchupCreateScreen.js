@@ -9,12 +9,17 @@ import Utilities from '../Services/Utilities'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import {Colors} from '../Themes/'
 import { RNS3 } from 'react-native-aws3'
+import Api from '../Services/Api'
+import S3 from '../Services/S3'
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 import MatchupActions from '../Redux/MatchupRedux'
+// import Reactotron from 'reactotron-react-native'
+import * as Animatable from 'react-native-animatable'
 
 // Styles
 import styles from './Styles/MatchupCreateScreenStyle'
 
+const api = Api.create()
 class MatchupCreateScreen extends Component {
   constructor (props) {
     super(props)
@@ -26,48 +31,51 @@ class MatchupCreateScreen extends Component {
     tempArray.push({side: this.state.sides.length + 1})
     this.setState(Object.assign({}, this.state, {sides: tempArray}))
   }
-  sendToS3 (tempObject, key) {
-    this.setState(Object.assign({}, this.state, {fetching: true}))
-    const file = {
-      uri: tempObject.imageUrl,
-      name: key,
-      type: "image/png"
-    }
-    const options = {
-      key: key,
-      bucket: "toosentsvids",
-      region: "us-west-2",
-      accessKey: "AKIAIGA2C2IZIWOYPCWQ",
-      secretKey: "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",
-      successActionStatus: 201
-    }
-    return RNS3.put(file, options).then((resp)=>{this.setState(Object.assign({}, this.state, {fetching: false}))}).catch((err)=>{console.error(err);this.setState(Object.assign({}, this.state, {fetching: false}))})
-  }
   isSideInvalid (side) {
-    return !side.name || (!side.ytvideo && !side.image)
+    return !side.name || (!side.ytvideo && !side.image && !side.video)
   }
   isFormInvalid() {
-    return !this.state.title
+    return !this.state.title || this.state.sides.filter((side, i)=>!this['side' + (i+1)].getData()).length > 0
   }
+
   async createMatchup () {
+    // Reactotron.log(this.state.sides.filter((side)=>!side.name || !side.mediaType))
     if(this.isFormInvalid()){
       return this.setState(Object.assign({}, this.state, {missingData: true}))
     }
     let isValid = true;
     // this.setState(Object.assign({}, this.state, {isLoading: true, missingData: false}))
-    let tempArray = [], tempObject = {}, matchupSides = []
+    let tempArray = [], matchupSides = []
+
     this.state.sides.forEach((side, i)=>{
-      tempObject = this['side' + (i+1)].getData()
-      if (this.isSideInvalid(tempObject)){
-        isValid = false
+      if (!this['side' + (i+1)].getData()) {
         return
       }
-      // if (tempObject.mediaType !== 'y'){  
-      //   tempArray.push(this.sendToS3(tempObject, tempObject.image))
-      // } 
-      tempObject.side = i + 1;
+      let tempObject = Object.assign({}, this['side' + (i+1)].getData())
+      tempObject.side = i + 1;    
+      if (tempObject.mediaType === 'vid'){
+        tempObject.file = {
+        uri: tempObject.videoUrl,
+        type: tempObject.mime,
+        name: tempObject.video,
+      };
+        tempObject.mp4 = tempObject.file.name.split(/(?!\.)\W/gm).join('-') + 'converted_video.mp4'
+        tempObject.webm = tempObject.file.name.split(/(?!\.)\W/gm).join('-') + 'converted_video.webm'
+        
+      } 
+      if (tempObject.mediaType === 'pic'){
+        tempObject.file = {
+        uri: tempObject.imageUrl,
+        type: tempObject.mime,
+        name: tempObject.image,
+      };
+
+      }
       matchupSides.push(tempObject)
     });
+    if (!isValid){
+      return
+    }
     // if (!isValid){
     //   return this.setState(Object.assign({}, this.state, {missingData: true, isLoading: false}))
     // }
@@ -80,6 +88,7 @@ class MatchupCreateScreen extends Component {
     //       }
     //   })
     // }
+
     let matchup = {
       title: this.state.title,
       category: this.state.category,
@@ -101,12 +110,11 @@ class MatchupCreateScreen extends Component {
     }
     return (
       <ScrollView style={styles.container}>
-      <BackArrow onPress={() => this.props.navigation.goBack(null)}/>
       <View style={styles.centered}><Text style={styles.heading}>Create Matchup</Text></View>
       <View style={styles.formContainer}>
-      <TextInput style={styles.matchupInput} placeholder='Matchup Title' onChangeText={(text) => this.setState(Object.assign({}, this.state, {title: text}))} value={this.state.title}/>
-      <Text>Category</Text>
-      <Picker style={styles.matchupInput}
+      <TextInput style={styles.matchupTextInput} placeholder='Matchup Title' onChangeText={(text) => this.setState(Object.assign({}, this.state, {title: text}))} value={this.state.title}/>
+      <Text style={styles.link}>Category</Text>
+      <Picker style={styles.matchupPicker}
       selectedValue ={this.state.category}
       onValueChange={(itemValue, itemIndex) => this.setState(Object.assign({}, this.state, {category: itemValue}))}
       >
@@ -116,17 +124,17 @@ class MatchupCreateScreen extends Component {
       {this.state.sides.map((side, i)=>{
         return <MatchupSide ref={(ref)=>{this['side'+ (i+1)] = ref}} userId={this.props.myId} key={i} side={side.side} />
       })}
-      <View style={{flexDirection: 'row'}}>
+      <View style={{flexDirection: 'row', marginVertical: 10}}>
       <TouchableOpacity onPress={()=>{this.addSide()}}><Icon name='plus-circle' size={40} color={Colors.brand}/></TouchableOpacity>
-      <Text style={{marginTop: 10}}>Add Side</Text>
+      <Text style={[styles.link, {marginTop: 10, marginLeft: 10}]}>Add Side</Text>
       </View>
-      <Text>Make Public </Text>
+      <Text style={[styles.link, {marginTop: 10}]}>Make Public </Text>
       <Switch
       onValueChange={(value) => this.setState({isPublic: value})}
       value={this.state.isPublic}>
       </Switch>
-      {this.state.missingData? <Text>Make Sure You Filled in this Form Correctly</Text>:null}
-      <FullButton text='Create' onPress={()=>{this.createMatchup()}} />
+      {this.state.missingData? <Animatable.Text animation="pulse" easing="ease-out" iterationCount={5} style={styles.warning}>Make Sure You Get Everything!</Animatable.Text>:null}
+      <FullButton styles={{marginTop: 20}} text='Create' onPress={()=>{this.createMatchup()}} />
       </View>
       </ScrollView>
       )

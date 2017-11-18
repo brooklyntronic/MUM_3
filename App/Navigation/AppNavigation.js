@@ -78,8 +78,8 @@ const PrimaryNav = StackNavigator({
                 AsyncStorage.multiRemove(keys)
               }).
               then(()=>
-
-                fetch(Utilities.baseUrl + 'signout')
+                {global.chatSocket.disconnect()
+                return fetch(Utilities.baseUrl + 'signout')}
                 ).
               then((resp)=> {
                 firebase.auth().signOut().then(function() {

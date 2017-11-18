@@ -1,5 +1,6 @@
 import { Platform } from 'react-native'
 import {orderBy} from 'lodash'
+import dateFormat from 'dateformat'
 export default {
   getAvatar: (match) => {
     if (match.facebook && !match.avatar){
@@ -14,8 +15,26 @@ export default {
       return match.sex === 'female' ? 'https://d23grucy15vpbj.cloudfront.net/webImg/icons/user-female-icon.png' : 'https://d23grucy15vpbj.cloudfront.net/webImg/icons/user-male-icon.png';
     }
   },
-  // baseUrl: Platform.OS === 'ios' ?  'http://192.168.0.12:3000/' : 'http://10.0.2.2:3000/',
-  baseUrl: 'https://safe-falls-71589.herokuapp.com/',
+  pollTranscoder: (jobId, fn, interval) =>{
+    var checkCondition = function(resolve, reject) { 
+        var ajax = fn(jobId);
+        ajax.then( function(response){
+            if(response.status === 200) {
+                resolve(response);
+            }
+            else if (response.status === 204) {
+                setTimeout(checkCondition, interval, resolve, reject);
+            }
+            else {
+                reject(new Error('timed out for ' + fn + ': ' + arguments));
+            }
+        });
+    };
+
+    return new Promise(checkCondition);
+  },
+  baseUrl: Platform.OS === 'ios' ?  'http://192.168.0.10:3000/' : 'http://10.0.2.2:3000/',
+  // baseUrl: 'https://safe-falls-71589.herokuapp.com/',
   matchupCategories: ['Film & Animation',
   'Cars & Vehicles',
   'Music',
@@ -39,6 +58,7 @@ export default {
     }
     sortedArray = orderBy(newArray, function(e) { return new Date(e.messages[0].createdAt)}, ['desc']);
     return sortedArray
-  }
+  }, 
+  formatDate: (date)=>dateFormat(date, `${new Date(date).getTime() < 7 *  24 * 60 * 60 * 1000 ? 'mmmm dS':'dddd'}, h:MM TT`)
 
 }

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { ScrollView, Text, View, Image, TouchableOpacity, AsyncStorage, ActivityIndicator } from 'react-native'
+import { ScrollView, Text, View, Image, TouchableOpacity, ActivityIndicator } from 'react-native'
 import { connect } from 'react-redux'
 import Orientation from 'react-native-orientation'
 // Add Actions - replace 'Your' with whatever your reducer is called :)
@@ -8,6 +8,7 @@ import {Images} from '../Themes'
 import ButtonBox from '../Components/ButtonBox'
 import BackArrow from '../Components/BackArrow'
 // Styles
+import { Badge } from 'react-native-elements'
 import UserActions from '../Redux/UserRedux'
 import styles from './Styles/AuthenticatedLaunchScreenStyle'
 import Utilities from '../Services/Utilities'
@@ -23,6 +24,7 @@ class AuthenticatedLaunchScreen extends Component {
   }
 
   componentWillMount () {
+
     const initial = Orientation.getInitialOrientation();
     if (initial === 'PORTRAIT') {
       this.setState(Object.assign({}, this.state, {orientation: 'portrait'}))
@@ -126,18 +128,26 @@ class AuthenticatedLaunchScreen extends Component {
       <View style={styles.mainContainer}>
 
       <View style={styles.buttonsContainer}>
-      <View style={this.props.complete ? {} : {backgroundColor: '#000', opacity: 0.5}}><ButtonBox onPress={this.openMatchupListScreen} style={styles.topLeftButton} text='Matchups' disabled={!this.props.complete}  icon='bar-chart' iconSize={40}/></View>
+      <View style={this.props.complete ? {} : {backgroundColor: '#000', opacity: 0.5}}><ButtonBox onPress={this.openMatchupListScreen} style={styles.topLeftButton} text='Matchups' disabled={!this.props.complete}  icon='bar-chart' iconSize={40}/>
+      {this.props.matchupRequests && this.props.matchupRequests > 0 ? <View style={{position: 'absolute', right: '25%', bottom: '50%'}}><Badge containerStyle={{ backgroundColor: 'red', padding: 5, borderRadius:5}} value={this.props.matchupRequests} /></View>:null}
+      </View>
       <View style={this.props.complete ? {} : {backgroundColor: '#000', opacity: 0.5}}><ButtonBox onPress={this.openMatchesSearch} style={styles.topRightButton} text='Find People' disabled={!this.props.complete} icon='search' iconSize={40} /></View>
       {this.state.orientation === 'landscape' ? <View style={this.props.complete ? {} : {backgroundColor: '#000', opacity: 0.5}}><ButtonBox onPress={this.openMatches} style={styles.middleLeftButton} text='My Matches' icon='heart' iconSize={40}/></View> : null}
       </View>
       {this.state.orientation === 'portrait' ? <View style={styles.buttonsContainer}>
-      <View style={this.props.complete ? {} : {backgroundColor: '#000', opacity: 0.5}}><ButtonBox onPress={this.openMatches} style={styles.middleLeftButton} text='My Matches' disabled={!this.props.complete} icon='heart' iconSize={40}/></View>
-      <View style={this.props.complete ? {} : {backgroundColor: '#000', opacity: 0.5}}><ButtonBox onPress={this.openMessages} style={styles.middleRightButton} text='Messages' disabled={!this.props.complete} icon='envelope' iconSize={40}/></View>
+      <View style={this.props.complete ? {} : {backgroundColor: '#000', opacity: 0.5}}><ButtonBox onPress={this.openMatches} style={styles.middleLeftButton} text='My Matches' disabled={!this.props.complete} icon='heart' iconSize={40}/>
+      {this.props.requests && this.props.requests > 0 ? <View style={{position: 'absolute', right: '25%', bottom: '50%'}}><Badge containerStyle={{ backgroundColor: 'red', padding: 10, borderRadius:5}} value={this.props.requests} /></View>:null}
+      </View>
+      <View style={this.props.complete ? {} : {backgroundColor: '#000', opacity: 0.5}}><ButtonBox onPress={this.openMessages} style={styles.middleRightButton} text='Messages' disabled={!this.props.complete} icon='envelope' iconSize={40}/>
+      {this.props.messages && this.props.messages > 0 ? <View style={{position: 'absolute', right: '25%', bottom: '50%'}}><Badge containerStyle={{ backgroundColor: 'red', padding: 10, borderRadius:5}} value={this.props.messages} /></View>:null}
+      </View>
       </View>:null}
       <View style={styles.buttonsContainer}>
-      {this.state.orientation === 'landscape' ? <View style={this.props.complete ? {} : {backgroundColor: '#000', opacity: 0.5}}><ButtonBox onPress={this.openMessages} style={styles.middleRightButton} text='Messages' icon='envelope' iconSize={40}/></View>:null}
-      <Animatable.View animation="flash" easing="ease-out" iterationCount={!this.props.complete ? "infinite" : 1}><ButtonBox onPress={this.openProfile} style={styles.bottomLeftButton} text='My Profile' icon='user-circle' iconSize={40}/></Animatable.View>
-      <Animatable.View animation="flash" easing="ease-out" iterationCount={!this.props.complete ? "infinite" : 1}><ButtonBox onPress={this.openPreferences} style={styles.bottomRightButton} text='Preferences' icon='wrench' iconSize={40} /></Animatable.View>
+      {this.state.orientation === 'landscape' ? <View style={this.props.complete ? {} : {backgroundColor: '#000', opacity: 0.5}}><ButtonBox onPress={this.openMessages} style={styles.middleRightButton} text='Messages' icon='envelope' iconSize={40}/>
+      {this.props.messages && this.props.messages > 0 ? <View style={{position: 'absolute', right: '25%', bottom: '50%'}}><Badge containerStyle={{ backgroundColor: 'red', padding: 10, borderRadius:5}} value={this.props.messages} /></View>:null}
+      </View>:null}
+      {this.props.complete ? <ButtonBox onPress={this.openProfile} style={styles.bottomLeftButton} text='My Profile' icon='user-circle' iconSize={40}/> : <Animatable.View animation="flash" easing="ease-out" iterationCount={!this.props.complete ? "infinite" : 1}><ButtonBox onPress={this.openProfile} style={styles.bottomLeftButton} text='My Profile' icon='user-circle' iconSize={40}/></Animatable.View>}
+      {this.props.complete ? <ButtonBox onPress={this.openPreferences} style={styles.bottomRightButton} text='Preferences' icon='wrench' iconSize={40} /> : <Animatable.View animation="flash" easing="ease-out" iterationCount={!this.props.complete ? "infinite" : 1}><ButtonBox onPress={this.openPreferences} style={styles.bottomRightButton} text='Preferences' icon='wrench' iconSize={40} /></Animatable.View>}
       </View>
       </View>
       </ScrollView>
@@ -148,7 +158,10 @@ class AuthenticatedLaunchScreen extends Component {
 const mapStateToProps = (state) => {
   // Reactotron.log(state)
   return {
-    complete: state.user.myProfile.complete.complete
+    complete: state.user.myProfile.complete.complete,
+    messages: state.user.notifications.messages,
+    requests: state.user.notifications.requests,
+    matchupRequests: state.user.notifications.matchups
   }
 }
 

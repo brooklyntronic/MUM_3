@@ -36,8 +36,11 @@ class MatchesScreen extends Component {
             onPress={()=>{this.openMatchScreen(user._id, type==='matches' ? 'match': 'request')}}
             avatar={{ uri: Utilities.getAvatar(user) }}
             roundAvatar
+            avatarStyle={{height: 70, width: 70, borderRadius: 35}}
+            avatarContainerStyle={{width: 70}}
             subtitle={`${user.location ? user.location.split(',')[0]: '- '}`}
-            title={user.name.toUpperCase()}
+            titleStyle={styles.link}
+            title={user.name}
             hideChevron
             containerStyle={{borderBottomWidth: 0, marginVertical: 10}}
             />

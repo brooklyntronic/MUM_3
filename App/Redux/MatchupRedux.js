@@ -8,6 +8,9 @@ const { Types, Creators } = createActions({
   listAttempt: null,
   listSuccess: ['matchupList'],
   listFailure: ['error'],
+  myInviteAttempt: null,
+  myInviteSuccess: ['invitedList'],
+  myInviteFailure: ['error'],
   myListAttempt: null,
   myListSuccess: ['myMatchupList'],
   myListFailure: ['error'],
@@ -24,9 +27,6 @@ const { Types, Creators } = createActions({
   getMatchupAttempt: ['matchupId'],
   getMatchupSuccess: ['matchup'],
   getMatchupFailure: ['error'],
-  inviteToMatchupAttempt: ['matchList','matchId'],
-  inviteToMatchupSuccess: ['matchList','matchId'],
-  inviteToMatchupFailure: ['error'],
   index: 0,
   openMatchup: ['matchup']
 
@@ -44,40 +44,46 @@ export const INITIAL_STATE = Immutable({
   sideVotes: null,
   matchup: null,
   matchupList: [],
+  invitedList: [],
   myMatchupList: [],
-  listShown: 'public',
+  listShown: 'matchupList',
   myMatchupsLoaded: false,
   matchupsLoaded: false,
   matchupsOpened: [],
   createFetching: false,
   matchInviteList: null,
-  voteFetching: false
+  voteFetching: false,
+  inviteListFetching:false
 })
 
 /* ------------- Reducers ------------- */
 export const getListAttempt = (state) => {
   return state.merge({fetching: true})}
-export const getMyListAttempt = (state) => {
-  return state
-}
+
 export const getListSuccess = (state, action) => {
   const {matchupList} = action
   return state.merge({fetching: false, matchupList: matchupList, index: 0, matchupsLoaded: true})
 }
 export const getListError = (state, action) => 
   state.merge({fetching: false, error: action.error })
+
+export const getMyListAttempt = (state) => {
+  return state
+}
 export const getMyListSuccess = (state, action) => {
   const {myMatchupList} = action
   return state.merge({fetching: false, myMatchupList: myMatchupList, index: 0, myMatchupsLoaded: true})
 }
 export const getMyListError = (state, action) => 
   state.merge({fetching: false, error: action.error })
+
+export const myInviteAttempt = (state) =>state.merge({inviteListFetching: true})
+export const myInviteSuccess = (state, action) =>state.merge({inviteListFetching: false, invitedList: action.invitedList})
+export const myInviteFailure = (state, action) =>state.merge({inviteListFetching: false, error: action.error})
+
 export const toggleLists = (state, action) =>{ 
-  if (action.showPublic){
-    return state.merge({listShown: 'public'})
-  }
-  return state.merge({listShown: 'private'})
-  }
+    return state.merge({listShown: action.listShown})
+}
 export const openMatchup = (state, action) => {
   const { matchup } = action
   let newMatchupArray = [...state.matchupsOpened]
@@ -116,7 +122,7 @@ export const createMatchupAttempt = (state) => {
   return state.merge({ createFetching: true, error: null, matchupsLoaded: false, myMatchupsLoaded:false })
 }
 export const createMatchupSuccess = (state, action) => {
-  return state.merge({ createFetching: false, error: null, matchup: action.matchup, listShown: action.matchup.isPublic ? 'public':  'private'})
+  return state.merge({ createFetching: false, error: null, matchup: action.matchup, listShown: 'myMatchupList'})
 }
 export const createMatchupFailure = (state, action) => {
   return state.merge({ createFetching: false, error: null, error: action.error })
@@ -142,6 +148,9 @@ export const reducer = createReducer(INITIAL_STATE, {
   [Types.MY_LIST_ATTEMPT]: getMyListAttempt,
   [Types.MY_LIST_SUCCESS]: getMyListSuccess,
   [Types.MY_LIST_FAILURE]: getMyListError,
+  [Types.MY_INVITE_ATTEMPT]: myInviteAttempt,
+  [Types.MY_INVITE_SUCCESS]: myInviteSuccess,
+  [Types.MY_INVITE_FAILURE]: myInviteFailure,
   [Types.SWITCH_LISTS]: toggleLists,
   [Types.GET_VOTES_ATTEMPT]: getVotesAttempt,
   [Types.GET_VOTES_SUCCESS]: getVotesSuccess,

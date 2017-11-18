@@ -26,6 +26,12 @@ export function * delete_message_thread (api, action) {
   const response = yield call(api.deleteMessageThread, action.msgId)
   if (response.ok) {
   	yield put(MessagesActions.deleteMessageThreadSuccess(response.data))
+    const messageResponse = yield call(api.getMessages)
+    if (messageResponse.ok) {
+      yield put(MessagesActions.messagesSuccessAll(messageResponse.data))
+    } else {
+      yield put(MessagesActions.messagesFailureAll(messageResponse.error))
+    }
   } else {
   	yield put(MessagesActions.deleteMessageThreadFailure(response.error))
   }
@@ -57,7 +63,7 @@ export function * get_message_thread (api, action) {
 } 
 
 export function * post_message (api, action) {
-  
+
   const response = yield call(api.postMessage, action.msg)
   if (response.ok) {
     // action.socketConnection.emit('msg_user_api_success', action.toId, action.fromId)

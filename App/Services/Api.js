@@ -18,7 +18,7 @@ const create = (baseURL = Utilities.baseUrl) => {
     headers: {
       'Cache-Control': 'no-cache',
     },
-    // 10 second timeout...
+    // 20 second timeout...
     timeout: 20000
   })
   // ------ 
@@ -38,10 +38,15 @@ const create = (baseURL = Utilities.baseUrl) => {
   // Matchups
   const setHeader = (accessToken) => api.setHeader('Authorization', accessToken)
   const getS3Policy = (type) => api.get('api/s3Policy?mimeType=' + type)
-  const putInS3 = (file, key) => api.post('api/putInS3', {file, key})
+  const putInS3 = (file, key) => api.post('api/putInS3', {file, key},  {timeout: 100000})
+  const getSignedUrl = (key, type) => api.post('api/getSignedUrl', {key, type})
+  const putVideoInS3 = (file, key) => api.post('api/putVideoToS3', {file, key}, {timeout: 100000})
+  const transcodeVideo = (key) => api.post('matchups/transcodeVideo', {key})
+  const pollTranscoder = (jobId) => api.post('matchups/pollTranscoder', {jobId})
   const getNotifications = () => api.get('notifications')
   const getMatchups = () => api.get('matchups')
   const getMyMatchups = () => api.get('myMatchups')
+  const getInvitedMatchups = () => api.get('invitedMatchups')
   const getMatchup = (matchupId) => api.get('matchups/'+matchupId)
   const createMatchup = (matchup) => api.post('matchups', JSON.stringify(matchup))
   const voteOnMatchup = (vote, matchupId) => api.post('users/votes',JSON.stringify({
@@ -49,7 +54,7 @@ const create = (baseURL = Utilities.baseUrl) => {
           'vote': vote,
           'matchup': matchupId
         }))
-  const getVotes = () =>api.get('users/votes')
+  const getVotes = () => api.get('users/votes')
   const addPhoto = (key) => api.post('users/photos', {photo: key})
   
   const inviteMatchesToMatchup = (list, matchup) => api.post('inviteToMatchup', JSON.stringify({list:list, matchup: matchup}))
@@ -95,10 +100,15 @@ const create = (baseURL = Utilities.baseUrl) => {
     setHeader,
     getS3Policy,
     putInS3,
+    getSignedUrl,
+    putVideoInS3,
+    transcodeVideo,
+    pollTranscoder,
     getNotifications,
     getMatchups,
     getMyMatchups,
     getMatchup,
+    getInvitedMatchups,
     getVotes,
     createMatchup,
     inviteMatchesToMatchup,

@@ -6,5 +6,6 @@ export default StyleSheet.create({
     flex: 1,
     marginTop: Metrics.navBarHeight,
     backgroundColor: Colors.background
-  }
+  },
+  editAvatar: {backgroundColor: '#000', padding: 5, opacity: .5, borderRadius: 3}
 })

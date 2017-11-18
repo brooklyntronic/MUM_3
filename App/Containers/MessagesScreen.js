@@ -11,6 +11,7 @@ import Swipeout from 'react-native-swipeout'
 import io from 'socket.io-client'
 import { EventRegister } from 'react-native-event-listeners'
 import MessagesActions from '../Redux/MessagesRedux'
+
 // import Reactotron from 'reactotron-react-native'
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
@@ -78,10 +79,14 @@ render () {
           <Swipeout right={swipeoutBtns} style={{backgroundColor: 'transparent'}}>
           <ListItem
           onPress={()=>this.gotoMessage(item.user)}
-          subtitle={item.messages[0].text}
+          subtitleNumberOfLines={2}
+          subtitle={`${item.messages[0].text}\n${Utilities.formatDate(item.messages[0].createdAt)}`}
           title={item.user.name}
+          titleStyle={styles.link}
           avatar={Utilities.getAvatar(item.user)}
           roundAvatar
+          avatarStyle={{height: 70, width: 70, borderRadius: 35}}
+          avatarContainerStyle={{height:70, width: 70, backgroundColor: 'white', borderRadius: 35, paddingTop: 0, paddingRight: 0, paddingLeft: 0, overflow: 'hidden'}}
           badge={this.newMessages(item.messages)}
           hideChevron
           containerStyle={{borderBottomWidth: 0, marginVertical: 10}}

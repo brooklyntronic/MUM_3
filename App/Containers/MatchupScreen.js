@@ -18,6 +18,9 @@ import { filter, indexOf, invert, findKey, union, findIndex } from 'lodash'
 // Styles
 import styles from './Styles/MatchupScreenStyle'
 import {Images} from '../Themes'
+import Video from 'react-native-video'
+// import Reactotron from 'reactotron-react-native'
+import Icon from 'react-native-vector-icons/FontAwesome'
 
 class MatchupScreen extends Component {
   constructor (props) {
@@ -99,12 +102,24 @@ class MatchupScreen extends Component {
             fullscreen={false}       
             loop={false} 
             style={styles.fullImage} 
+            controls={true}
             />
             </View>
             {this.props.matchup.matchupType === 'Poll' || this.props.matchup.myVote ? null : (this.props.voteFetching ? <FullButton onPress={()=>this.vote(item.side)}  text={'Vote '+ item.name} /> : <View style={styles.padding}><ActivityIndicator/></View>)}
             </View>
             )
-        }
+        } if(item.mediaType === 'vid'){
+            return (<View  style={styles.centered}   key={item.side}>
+                        <Text>Video</Text>
+                        <Video source={{uri: `https://d2heqpumv6ps36.cloudfront.net/Converted/${item.mp4}`, mainVer: 1, patchVer: 0}} // Looks for .mp4 file (background.mp4) in the given expansion version.
+                   rate={1.0}                   // 0 is paused, 1 is normal.
+                   volume={1.0}                 // 0 is muted, 1 is normal.
+                   muted={false}                // Mutes the audio entirely.
+                   paused={false}
+                   repeat={true}               // Pauses playback entirely.  // Callback when video cannot be loaded
+                   style={styles.fullImage} />
+                    </View>)
+          }
       })
       )
   }
@@ -117,13 +132,32 @@ class MatchupScreen extends Component {
         ))}
     }
     swiperSlides () {
-      return (
+      return this.props.matchup ? (
         this.props.matchup.sides.map((item)=>{
+
+          if(item.mediaType === 'vid'){
+           return ( <View key={item.side}>
+                    <TouchableOpacity style={{position: 'absolute', top: '45%', left: '45%', zIndex:10}}><Icon name="play-circle" size={60} style={{color: 'white'}} onPress={()=>{this['player' + item.side].presentFullscreenPlayer()}}/></TouchableOpacity>
+                       <Video source={{uri: `https://d2heqpumv6ps36.cloudfront.net/Converted/${item.mp4}`, mainVer: 1, patchVer: 0}} // Looks for .mp4 file (background.mp4) in the given expansion version.
+                  rate={1.0}                   // 0 is paused, 1 is normal.
+                  volume={1.0}                 // 0 is muted, 1 is normal.
+                  muted={false}                // Mutes the audio entirely.
+                  paused={true} 
+                  repeat={true}    
+                  ref={(ref) => {
+                      this['player' + item.side] = ref
+                  }}          
+                  style={styles.fullImage} />
+                  {!this.props.matchup.myVote && !this.props.voteFetching ? <View style={styles.padding}><FullButton onPress={()=>this.vote(item.side)}  text={'Vote '+ item.name} /></View> : this.props.matchup.myVote == item.side ? <View style={[styles.padding, styles.centered]}><Text style={styles.matchupHeading}>Voted for {this.props.matchup.sides[this.props.matchup.myVote - 1].name}</Text></View> :  <View style={[styles.padding, styles.centered]}><Text style={styles.matchupHeading}>{item.name}</Text></View>}
+              {this.props.voteFetching? <View  style={styles.padding}><ActivityIndicator/></View>:null}
+                   </View>)
+          }
           if (item.mediaType === 'pic'){
             return (
               <View style={styles.centered}  key={item.side}>
               <Image source={{uri: 'https://d23grucy15vpbj.cloudfront.net/' + item.image}}  style={styles.fullImage}  />
-              {!this.props.matchup.myVote ? (!this.props.voteFetching ? <FullButton onPress={()=>this.vote(item.side)}  text={'Vote '+ item.name} /> : <View  style={styles.padding}><ActivityIndicator/></View> ): this.props.matchup.myVote == item.side ? <Text style={styles.matchupHeading}>Voted for {this.props.matchup.sides[this.props.matchup.myVote - 1].name}</Text> : <Text style={styles.matchupHeading}>{item.name}</Text>}
+              {!this.props.matchup.myVote && !this.props.voteFetching ? <View style={styles.padding}><FullButton onPress={()=>this.vote(item.side)}  text={'Vote '+ item.name} /></View> : this.props.matchup.myVote == item.side ? <View style={[styles.padding, styles.centered]}><Text style={styles.matchupHeading}>Voted for {this.props.matchup.sides[this.props.matchup.myVote - 1].name}</Text></View> :  <View style={[styles.padding, styles.centered]}><Text style={styles.matchupHeading}>{item.name}</Text></View>}
+              {this.props.voteFetching? <View  style={styles.padding}><ActivityIndicator/></View>:null}
               </View>
               )
           } if (item.mediaType === 'y'){
@@ -138,13 +172,13 @@ class MatchupScreen extends Component {
               style={styles.fullImage} 
               />
               </View>
-              {!this.props.matchup.myVote && !this.props.voteFetching ? <FullButton onPress={()=>this.vote(item.side)}  text={'Vote '+ item.name} /> : this.props.matchup.myVote == item.side ? <Text style={styles.matchupHeading}>Voted for {this.props.matchup.sides[this.props.matchup.myVote - 1].name}</Text> : <Text style={styles.matchupHeading}>{item.name}</Text>}
+              {!this.props.matchup.myVote && !this.props.voteFetching ? <View style={styles.padding}><FullButton onPress={()=>this.vote(item.side)}  text={'Vote '+ item.name} /></View> : this.props.matchup.myVote == item.side ? <View style={[styles.padding, styles.centered]}><Text style={styles.matchupHeading}>Voted for {this.props.matchup.sides[this.props.matchup.myVote - 1].name}</Text></View> :  <View style={[styles.padding, styles.centered]}><Text style={styles.matchupHeading}>{item.name}</Text></View>}
               {this.props.voteFetching? <View  style={styles.padding}><ActivityIndicator/></View>:null}
               </View>
               )
-          }
+          } 
         }) 
-        )
+        ) : null
     }
     choices() {
       if (!this.props.fetching){
@@ -157,12 +191,12 @@ class MatchupScreen extends Component {
       }
     }
     sendInvite (list) {
-      this.props.inviteToMatchup(list, this.props.matchup.prettyUrl)
+      this.props.inviteToMatchup(list, this.props.matchup.prettyUrl, global.chatSocket, this.props.myId)
       this.setState(Object.assign({}, this.state, {inviteList: []}))
     }
     // this.props.inviteToMatchup(this.state.inviteList, this.props.matchup.prettyUrl)
     render () {
-      if (this.props.fetching) {
+      if (this.props.fetching || !this.props.matchup) {
         return (
           <View style={styles.mainContainer}>
           <View style={styles.content}>
@@ -174,7 +208,7 @@ class MatchupScreen extends Component {
       return (
         <ScrollView contentContainerStyle={styles.mainScroll}>
         <View style={styles.container}>
-        <View style={{flexDirection: 'row', justifyContent:'space-between', padding: 15}}><RoundedButton text='Prev' onPress={this.goPrev}/><RoundedButton text='Next' onPress={this.goNext}/></View>
+        <View style={{flexDirection: 'row', justifyContent:'space-between', padding: 15}}><TouchableOpacity onPress={this.goPrev}><Text style={styles.link}>Prev</Text></TouchableOpacity><TouchableOpacity onPress={this.goNext}><Text style={styles.link}>Next</Text></TouchableOpacity></View>
         <View style={styles.mainContainer}>
         <Text style={styles.heading}>{this.props.matchup.title}</Text>
         {this.contents()}
@@ -228,9 +262,9 @@ class MatchupScreen extends Component {
               </View>
               <List style={{borderWidth: 0}}>
               {this.filterNames(this.state.searchText, this.props.matches).map((result, i)=>{
-                const tempList = this.props.inviteList[this.props.matchup.prettyUrl] || []
+                const tempList = this.state.inviteList || []
                 
-                return findIndex(tempList, {_id: result._id}) < 0 ? (<ListItem style={{borderBottomWidth: 0, paddingVertical: 10}} onPress={()=>{this.invite(result)}} key={i} avatar={{uri: Utilities.getAvatar(result)}} title={result.name}/>) : false
+                return findIndex(tempList.concat(this.props.inviteList[this.props.matchup.prettyUrl]), {_id: result._id}) < 0 ? (<ListItem style={{borderBottomWidth: 0, paddingVertical: 10}} onPress={()=>{this.invite(result)}} key={i} avatar={{uri: Utilities.getAvatar(result)}} title={result.name}/>) : false
               })}
               </List>
               {this.state.inviteList.length > 0 ? <FullButton text='Send Invite to Selected' onPress={()=>{this.sendInvite(this.state.inviteList)}}/>: null}
@@ -248,6 +282,7 @@ class MatchupScreen extends Component {
   }
 
   const mapStateToProps = (state) => {
+    // Reactotron.log(state.matchups.matchup)
     return {
       myId: state.user.user._id,
       matchup: state.matchups.matchup,
@@ -266,7 +301,7 @@ class MatchupScreen extends Component {
     return {
       vote: (vote, matchupId)=>{dispatch(MatchupActions.voteAttempt(vote, matchupId))},
       getMatchup: (matchupId)=>{dispatch(MatchupActions.getMatchupAttempt(matchupId))},
-      inviteToMatchup: (list, matchup)=>{dispatch(UserActions.inviteToMatchupAttempt(list, matchup))}
+      inviteToMatchup: (list, matchup, socket, myId)=>{dispatch(UserActions.inviteToMatchupAttempt(list, matchup, socket, myId))}
     }
   }
 

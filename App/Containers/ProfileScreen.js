@@ -7,6 +7,7 @@ import Utilities from '../Services/Utilities'
 import Swiper from 'react-native-swiper'
 import { List, ListItem } from 'react-native-elements'
 import Icon from 'react-native-vector-icons/FontAwesome'
+import MessagesActions from '../Redux/MessagesRedux'
 // import Reactotron from 'reactotron-react-native'
 import {findIndex} from 'lodash'
 // Add Actions - replace 'Your' with whatever your reducer is called :)
@@ -49,14 +50,7 @@ class ProfileScreen extends Component {
     this.props.navigation.navigate('MessageScreen', {threadId: this.props.user})
   }
   openVideoChat(){
-    if(this.state.onCall){
-      return
-    }
-    this.setState(Object.assign({}, this.state, {onCall: true}),
-      function(){
-        global.chatSocket.emit('call_user', this.props.user._id, this.props.myId, {called: this.props.user._id, caller: this.state.myId});
-        this.props.navigation.navigate('NewVideoChatContainer', {id: this.props.myId, toId: this.props.user._id, called: 'no'})
-      })
+    this.props.makeCall(this.props.user._id, this.props.myId, global.chatSocket)
 
   }
   getPermissionToUnfriend(){
@@ -106,9 +100,9 @@ class ProfileScreen extends Component {
       <View style={styles.mainContainer}>
       <Text style={styles.heading}>{this.props.user.name}</Text>
       {findIndex(this.props.friends, {_id: this.props.user._id})> -1 ? (<View style={styles.iconBox}>
-        <TouchableOpacity onPress={()=>{this.openVideoChat()}}>
-        <Icon style={styles.icons} name='phone-square' size={40} />
-        </TouchableOpacity>
+        {this.props.user.isOnline ? <TouchableOpacity onPress={()=>{this.openVideoChat()}}>
+                <Icon style={styles.icons} name='phone-square' size={40} />
+                </TouchableOpacity> : null}
         <TouchableOpacity onPress={()=>{this.gotoMessage()}}>
         <Icon style={styles.icons} name='envelope' size={40}  />
         </TouchableOpacity>
@@ -128,14 +122,14 @@ class ProfileScreen extends Component {
       :null}
       {(this.props.requestsSent.indexOf(this.props.user._id)< 0  && findIndex(this.props.requestsReceived, {_id: this.props.user._id}) < 0) && findIndex(this.props.friends, {_id: this.props.user._id}) < 0 ? 
       (<View style={styles.iconBox}>
-        <TouchableOpacity onPress={()=>{this.sendRequest()}}>
-        <Icon style={styles.icons} name='heart' size={40} />
+        <TouchableOpacity onPress={()=>{this.sendRequest()}} style={{flexDirection: 'row', alignItems: 'center'}}>
+        <Icon style={styles.icons} name='heart' size={40} /><Text style={styles.link}>Request</Text>
         </TouchableOpacity>
         </View>)
       :null}
       {this.props.requestsSent.indexOf(this.props.user._id) > -1 && findIndex(this.props.requestsReceived, {_id: this.props.user._id}) < 0 && findIndex(this.props.friends, {_id: this.props.user._id}) ? <View style={styles.iconBox}>
-        <TouchableOpacity>
-        <Icon style={styles.icons} name='heart-o' size={40} />
+        <TouchableOpacity  style={{flexDirection: 'row', alignItems: 'center'}}>
+        <Icon style={styles.icons} name='heart-o' size={40} /><Text style={styles.link}>Requested</Text>
         </TouchableOpacity>
         </View> : null}
       <Image style={styles.fullImage} source={{uri:this.state.avatar?this.state.avatar : Utilities.getAvatar(this.props.user)}}/>      
@@ -194,7 +188,10 @@ const mapDispatchToProps = (dispatch) => {
     unfriend: (userId, myId) => {dispatch(UserActions.unfriendAttempt(userId, myId))},
     addFriend: (userId, myId) => {dispatch(UserActions.acceptFriendRequestAttempt(userId, myId))},
     sendRequest: (userId, myId) => {dispatch(UserActions.sendFriendRequestAttempt(userId, myId))},
-    denyRequest: (userId) => {dispatch(UserActions.denyFriendRequestAttempt(userId))}
+    denyRequest: (userId) => {dispatch(UserActions.denyFriendRequestAttempt(userId))},
+    makeCall: (recipient, caller, socketConnection) => {
+      dispatch(MessagesActions.makeCallAttempt(recipient, caller, socketConnection))
+    }
   }
 }
 

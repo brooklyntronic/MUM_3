@@ -111,28 +111,6 @@ class MyProfileScreen extends Component {
       const file = {body: result.data, type: result.mime}
       this.props.uploadPhoto(file, key)
     })
-    // .then(image => {
-    //   const file = {
-    //     uri: image.path,
-    //     name: decodeURIComponent('profilePics/'+ this.state.userId + '/' + Date.now() + image.filename.split(' ').join('-').split('.').join('-').replace('#', '-')),
-    //     type: "image/png"
-    //   }
-    //   // let tempPhotoArray = this.props.profile.photos
-    //   const options = {
-    //     key: decodeURIComponent('profilePics/'+ this.state.userId + '/' + Date.now() + image.filename.split(' ').join('-').split('.').join('-').replace('#', '-')),
-    //     bucket: "toosentsvids",
-    //     region: "us-west-2",
-    //     accessKey: "AKIAIGA2C2IZIWOYPCWQ",
-    //     secretKey: "si+aOyZ4zYRPSBz2ecI7uucl6zoAMfofgrDxcK6V",
-    //     successActionStatus: 201
-    //   }
-    //   RNS3.put(file, options).then(response => {
-    //     const responseText = JSON.stringify({photo: response.body.postResponse.key})
-    //     const photoKey = response.body.postResponse.key
-    //     this.setState({photosUploading: false})
-    //     this.props.uploadPhoto(photoKey)
-    //   });
-    // }).catch((err) =>console.log(err)).done();
   }
   goToSignIn () {
     this.props.navigation.navigate('SignupScreen')
@@ -153,9 +131,9 @@ class MyProfileScreen extends Component {
       <View style={styles.centered}><Text style={styles.heading}>My Profile</Text></View>
       {this.props.viewedPhoto ? <Image style={styles.fullImage} source={{uri: 'https://d23grucy15vpbj.cloudfront.net/' + this.props.viewedPhoto}}>
             {!this.props.profile.avatar || this.props.viewedPhoto.indexOf(this.props.profile.avatar) < 0 ? 
-              (<View style={{flexDirection: 'row', position: 'absolute', top: 0, zIndex: 100}}>
-                <TouchableOpacity style={{backgroundColor: '#000', padding: 5, opacity: .5}} onPress={()=>{this.makeAvatar(this.props.viewedPhoto)}}><Icon name='user-circle' size={40} style={{color: '#fff'}}/></TouchableOpacity>
-                <TouchableOpacity style={{marginLeft: 20, padding: 5, backgroundColor: '#000', opacity: .5}} onPress={()=>{this.deletePhoto(this.props.viewedPhoto)}}><Icon style={styles.icons} name='trash-o' size={40} style={{color: '#fff'}} /></TouchableOpacity>
+              (<View style={styles.editAvatarContainer}>
+                <TouchableOpacity style={styles.editAvatar} onPress={()=>{this.makeAvatar(this.props.viewedPhoto)}}><Icon name='user-circle' size={40} style={{color: '#fff'}}/></TouchableOpacity>
+                <TouchableOpacity style={[styles.editAvatar, {marginLeft: 20}]} onPress={()=>{this.deletePhoto(this.props.viewedPhoto)}}><Icon style={styles.icons} name='trash-o' size={40} style={{color: '#fff'}} /></TouchableOpacity>
                 </View>):null}</Image> : null}
 
         {!this.props.photosUploading && this.props.profile && this.props.profile.photos.length > 0  ?
@@ -179,12 +157,12 @@ class MyProfileScreen extends Component {
           {this.state.editOpen[100] ?<View style={{flexDirection: 'row', justifyContent: 'space-around' }}><RadioButton text='Male' selected={this.state.sex === 'male'}  onPress={()=>{this.setSex('male')}}/><RadioButton text='Female' selected={this.state.sex==='female'} onPress={()=>{this.setSex('female')}}/></View> : null}
           <View>
           <FormLabel>My Location</FormLabel>
-          <TouchableOpacity onPress={()=>{this.openMap()}}><View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 5, marginBottom: 10}}><Text style={{marginLeft: 15}}>{this.props.profile.location.value || 'Enter Location'}</Text><Icon name='pencil-square-o' size={25}/></View></TouchableOpacity>
+          <TouchableOpacity onPress={()=>{this.openMap()}}><View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 5, marginBottom: 10}}><Text style={[{marginLeft: 15}, styles.link]}>{this.props.profile.location.value || 'Enter Location'}</Text><Icon name='pencil-square-o' style={styles.link} size={25}/></View></TouchableOpacity>
           {this.state.writtenAttributes.map((attribute, i)=>{
             return (
               <View key={attribute.label}>
               <FormLabel>{attribute.label}</FormLabel>
-              {this.state.editOpen[i] ? null :<TouchableOpacity onPress={()=>{this.showEdit(i)}}><View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 5, marginBottom: 10}}><Text style={{marginLeft: 15}}>{attribute.value}</Text><Icon name='pencil-square-o' size={25}/></View></TouchableOpacity>}
+              {this.state.editOpen[i] ? null :<TouchableOpacity onPress={()=>{this.showEdit(i)}}><View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 5, marginBottom: 10}}><Text style={[{marginLeft: 15}, styles.link]}>{attribute.value}</Text><Icon name='pencil-square-o' style={styles.link} size={25}/></View></TouchableOpacity>}
               {this.state.editOpen[i] ?<View><View style={{paddingVertical: 12}}><FormInput value={attribute.value} onChangeText={(text)=>{this.updateText(attribute, text)}}/></View><Button raised icon={{name: 'cached'}} title='Save' onPress={()=>{this.saveItem(attribute, true)}}/></View>: null}
               </View>
               )
@@ -193,7 +171,7 @@ class MyProfileScreen extends Component {
             return (
               <View key={attribute.label}>
               <FormLabel>{attribute.label}</FormLabel>
-              {this.state.pickerOpen[i] ? null: <TouchableOpacity onPress={()=>{this.showPicker(i)}}><View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 5, marginBottom: 10}}><Text  style={{marginLeft: 15}}>{attribute.value}</Text><Icon name='pencil-square-o' size={25}/></View></TouchableOpacity>}
+              {this.state.pickerOpen[i] ? null: <TouchableOpacity onPress={()=>{this.showPicker(i)}}><View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 5, marginBottom: 10}}><Text style={[{marginLeft: 15}, styles.link]} >{attribute.value}</Text><Icon name='pencil-square-o' style={styles.link} size={25}/></View></TouchableOpacity>}
               {this.state.pickerOpen[i]?<View><Picker
                 selectedValue={attribute.value}
                 onValueChange={(itemValue, itemIndex) => this.updatePicker(attribute, itemValue)}>

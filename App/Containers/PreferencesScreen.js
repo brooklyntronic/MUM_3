@@ -75,7 +75,7 @@ class PreferencesScreen extends Component {
       <ScrollView style style={styles.mainScroll}>
       <View style={{marginTop: 40}}>
       <View style={styles.switchContainer}>
-      <Text style={{paddingLeft: 20}}>Use Location</Text>
+      <Text style={[styles.link, {paddingLeft: 20}]}>Use Location</Text>
       <Switch
       style={{marginLeft: 20}}
       onValueChange={(value) => {this.changeUseLocation(value)}}
@@ -84,13 +84,13 @@ class PreferencesScreen extends Component {
       </View>
       {this.state.useLocation ? <View>
         <FormLabel>Location</FormLabel>
-        <TouchableOpacity onPress={()=>{this.props.navigation.navigate('MapPreferenceScreen', {fromProfile: 'no'})}}><View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 5, marginBottom: 10}}><Text  style={{marginLeft: 15}}>{this.props.preferences.location.value || 'Enter Preferred Location'}</Text><Icon name='pencil-square-o' size={25}/></View></TouchableOpacity>
+        <TouchableOpacity onPress={()=>{this.props.navigation.navigate('MapPreferenceScreen', {fromProfile: 'no'})}}><View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 5, marginBottom: 10}}><Text  style={[{marginLeft: 15}, styles.link]}>{this.props.preferences.location.value || 'Enter Preferred Location'}</Text><Icon name='pencil-square-o' style={styles.link} size={25}/></View></TouchableOpacity>
       </View>: null}
         {this.state.picAttributes.map((attribute, i)=>{
           return (
             <View key={attribute.label}>
             <FormLabel>{attribute.label}</FormLabel>
-            {this.state.pickerOpen[i] ? null: <TouchableOpacity onPress={()=>{this.showPicker(i)}}><View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 5, marginBottom: 10}}><Text  style={{marginLeft: 15}}>{attribute.value}</Text><Icon name='pencil-square-o' size={25}/></View></TouchableOpacity>}
+            {this.state.pickerOpen[i] ? null: <TouchableOpacity onPress={()=>{this.showPicker(i)}}><View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 5, marginBottom: 10}}><Text  style={[{marginLeft: 15}, styles.link]}>{attribute.value}</Text><Icon name='pencil-square-o'  style={styles.link} size={25}/></View></TouchableOpacity>}
             {this.state.pickerOpen[i]?<View><Picker
             selectedValue={attribute.value ? attribute.value : attribute.options[0].value}
             onValueChange={(itemValue, itemIndex) => this.updatePicker(attribute, itemValue)}>

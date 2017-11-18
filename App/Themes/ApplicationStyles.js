@@ -40,6 +40,10 @@ const ApplicationStyles = {
       color: Colors.brand,
       fontWeight: 'bold'
     },
+    warning: {
+      color: 'red',
+      fontWeight: 'bold'
+    },
     mapImage: {
       width: Metrics.screenWidth * .8,
       height: Metrics.screenWidth * .8,
@@ -52,7 +56,8 @@ const ApplicationStyles = {
     matchupSliderWrapper: {
       height: Metrics.screenWidth
     },
-    matchupInput: {borderWidth: 1, borderColor: '#ccc', padding: 10, borderRadius: 5, marginVertical: 10},
+    matchupPicker: {borderWidth: 1, borderColor: '#ccc', padding: 10, borderRadius: 5, marginVertical: 10},
+    matchupTextInput: {borderBottomWidth: 1, borderColor: '#ccc', paddingVertical: 10, marginVertical: 10},
     mainScroll: {
       backgroundColor: Colors.snow,
       flexGrow: 1
@@ -75,6 +80,12 @@ const ApplicationStyles = {
       alignItems: 'center',
       backgroundColor: '#000'
     },
+     overlay:{
+    width: Metrics.screenWidth,
+    backgroundColor: 'black',
+    opacity: .7,
+    padding: 10, marginBottom: 25
+  },
     overlayImage: {
       width: Metrics.screenWidth,
       height: Metrics.screenWidth,
@@ -106,7 +117,7 @@ const ApplicationStyles = {
      width: Metrics.screenWidth * .8
    },
    icons: {color: Colors.brand},
-   iconBox: {width:Metrics.screenWidth, flex: 1, alignSelf: 'center', flexDirection:'row', justifyContent: 'space-around', marginVertical: Metrics.baseMargin},
+   iconBox: {flexDirection:'row', justifyContent: 'space-around', marginVertical: Metrics.baseMargin, width: '100%'},
    heading: {
     ...Fonts.style.h5,
     color: Colors.brand,
@@ -174,12 +185,7 @@ const ApplicationStyles = {
   centered: {
     alignItems: 'center',
   },
-  overlay:{
-    width: Metrics.screenWidth,
-    backgroundColor: Colors.brand,
-    opacity: .7,
-    padding: 10, marginBottom: 25
-  },
+ 
   padding: {
     padding: Metrics.doubleBaseMargin
   }

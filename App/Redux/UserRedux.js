@@ -108,7 +108,7 @@ const { Types, Creators } = createActions({
   deletePhotoSuccess: ['myProfile'],
   deletePhotoFailure: ['error'],
 
-  inviteToMatchupAttempt: ['matchList','matchId'],
+  inviteToMatchupAttempt: ['matchList','matchId', 'socket', 'myId'],
   inviteToMatchupSuccess: ['matchList'],
   inviteToMatchupFailure: ['error']
 })

@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { ActivityIndicator, View, ScrollView, Text, ListView, Dimensions, TouchableOpacity, AsyncStorage } from 'react-native'
+import { Rating } from 'react-native-elements'
 import Image from 'react-native-image-progress'
 import { connect } from 'react-redux'
 import {Images} from '../Themes'
@@ -60,7 +61,7 @@ class MatchesSearchScreen extends Component {
            <View style={styles.centered}>
            <Image style={styles.image} source={{uri:Utilities.getAvatar(user)}}>
            <View style={styles.overlay}>
-           <Text style={styles.paragraph}>{user.name.toUpperCase()}</Text>
+           <Text style={styles.paragraph}>{user.name}</Text>
            <Text style={styles.paragraph}>{user.location.split(',')[0]}</Text>
            </View>
            </Image>
@@ -80,10 +81,21 @@ class MatchesSearchScreen extends Component {
       <Swiper showsButtons={true} showsPagination={false}>
       {this.props.matchUsers.map((user, i)=>{
         return( <View  key={user._id}><TouchableOpacity onPress={()=>this.openMatchScreen(user._id)}>
+          {user.matchedAnswers ? <Rating
+
+            type='heart'
+            ratingCount={10}
+            fractions={2}
+            startingValue={user.matchedAnswers}
+            imageSize={20}
+            onFinishRating={this.ratingCompleted}
+            ratingBackgroundColor='transparent'
+            style={{alignItems: 'center'}}
+          />:null}
           <View style={styles.centered}>
           <Image style={styles.image} source={{uri:Utilities.getAvatar(user)}}>
           <View style={styles.overlay}>
-          <Text style={styles.paragraph}>{user.name.toUpperCase()}</Text>
+          <Text style={styles.paragraph}>{user.name}</Text>
           <Text style={styles.paragraph}>{user.location.split(',')[0]}</Text>
           </View>
           </Image>

@@ -4,6 +4,6 @@ import { Colors, Metrics, ApplicationStyles } from '../../Themes/'
 export default StyleSheet.create({
 ...ApplicationStyles.screen,
 topBar: {
-	flexDirection: 'row', width: Metrics.screenWidth, justifyContent: 'space-between'
+	flexDirection: 'row', width: '100%', justifyContent: 'space-between'
 }
 })

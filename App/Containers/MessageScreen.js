@@ -91,6 +91,7 @@ componentWillMount(){
     })
   })
   this.chatInit()
+  // global.chatSocket.on('msg_user_handle', this.sendReadReceipt)
   // global.chatSocket.on('msg_read_handle', ()=>{
   //   let tempArray = [...this.state.messageThread]
   //     tempArray.forEach((message)=>{
@@ -309,7 +310,7 @@ componentWillMount(){
       <View style={styles.container}>
       <View style={styles.topBar}>
       <BackArrow onPress={() => this.props.navigation.goBack(null)}/>
-      {this.state.messageThreadUser?<Text style={styles.messageHeading}>{this.state.messageThreadUser.name}</Text>:null}{this.state.messageThreadUser?<TouchableOpacity onPress={()=>{this.openVideoChat()}}><Icon name='phone-square' style={styles.phone} size={40}/></TouchableOpacity>:null}
+      {this.state.messageThreadUser ?<Text style={styles.messageHeading}>{this.state.messageThreadUser.name}</Text>:null}{this.state.messageThreadUser  && this.state.messageThreadUser.isOnline ? <TouchableOpacity onPress={()=>{this.openVideoChat()}}><Icon name='phone-square' style={styles.phone} size={40}/></TouchableOpacity>:null}
       </View>
       {this.props.navigation.state.params.user === 'newMessage' && !this.state.messageThreadUser ? 
       ( <View>
