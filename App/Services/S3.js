@@ -29,7 +29,7 @@ export default {
 			'acl': 'public-read',
 			'policy': params.s3Policy,
 			'signature': params.s3Signature,
-			'bucket': file.type.indexOf('video') > -1 ? 'toosentsuploads': 'toosentsvids',
+			'bucket': 'toosentsuploads',
 			'successActionStatus': '201'
 		}
 		return RNS3.put(file, options)

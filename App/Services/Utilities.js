@@ -33,8 +33,8 @@ export default {
 
     return new Promise(checkCondition);
   },
-  baseUrl: Platform.OS === 'ios' ?  'http://192.168.0.10:3000/' : 'http://10.0.2.2:3000/',
-  // baseUrl: 'https://safe-falls-71589.herokuapp.com/',
+  // baseUrl: Platform.OS === 'ios' ?  'http://192.168.0.10:3000/' : 'http://10.0.2.2:3000/',
+  baseUrl: 'https://safe-falls-71589.herokuapp.com/',
   matchupCategories: ['Film & Animation',
   'Cars & Vehicles',
   'Music',
