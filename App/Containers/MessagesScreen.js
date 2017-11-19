@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { ScrollView, Text, FlatList, View, ActivityIndicator, Image, TouchableOpacity, AsyncStorage } from 'react-native'
 import {Images, Colors} from '../Themes/'
 import { connect } from 'react-redux'
-import { List, ListItem } from 'react-native-elements'
+import { List, ListItem, SearchBar } from 'react-native-elements'
 import PageHeader from '../Components/PageHeader'
 import Addicon from '../Components/Addicon'
 import Icon from 'react-native-vector-icons/FontAwesome'
@@ -22,6 +22,9 @@ import styles from './Styles/MessagesScreenStyle'
 class MessagesScreen extends Component {
   constructor (props) {
     super(props)
+    this.state = {
+      searchText: ''
+    }
     // this.socket.on('call_user_handle', (username, data)=>{this.props.navigation.navigate('PhoneCallScreen', {id: data.caller})
     //})
   }
@@ -65,10 +68,17 @@ render () {
   }
   return (
     <ScrollView contentContainerStyle={styles.mainScroll}>
+    <SearchBar
+    containerStyle = {styles.searchBar}
+    round
+    lightTheme
+  onChangeText={(text)=>{this.setState(Object.assign({}, this.state, {searchText: text}))}}
+  onClearText={()=>{this.setState(Object.assign({}, this.state, {searchText: ''}))}}
+  placeholder='Search Messages...' />
     <Addicon onPress={()=>{this.createMessage()}} />
     <List containerStyle={{borderTopWidth: 0}}>
     <FlatList
-    data={this.props.messages}
+    data={this.props.messages.filter((message)=>message.user.name.indexOf(this.state.searchText) > -1)}
     renderItem={( {item }) => {
       let swipeoutBtns = [{
               text: 'Delete',

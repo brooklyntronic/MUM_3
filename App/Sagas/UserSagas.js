@@ -363,6 +363,16 @@ export function * search_matches_preference (api, action) {
   }
 
 }
+
+export function * search_matches (api, action) {
+  const response= yield call(api.searchMatches, action.searchTerm)
+  if (response.ok){
+    yield put(UserActions.searchMatchesSuccess(response.data))
+  } else {
+    yield put(UserActions.searchMatchesFailure(response.error))
+  }
+
+}
 // export function * search_matches_votes (api, action) {
 //   const response = yield call(api.getMatchesByMatchups)
 //   if (response.ok){

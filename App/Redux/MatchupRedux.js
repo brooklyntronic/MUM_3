@@ -17,6 +17,9 @@ const { Types, Creators } = createActions({
   createMatchupAttempt: ['matchup'],
   createMatchupSuccess: ['matchup'],
   createMatchupFailure: ['error'],
+  searchMatchupAttempt: ['searchTerm', 'myList'],
+  searchMatchupSuccess: ['searchResults'],
+  searchMatchupFailure: ['error'],
   switchLists: ['listShown'],
   getVotesAttempt: null,
   getVotesSuccess: ['sideVotes'],
@@ -39,7 +42,7 @@ export default Creators
 
 export const INITIAL_STATE = Immutable({
   fetching: true,
-  matchupFetching: true,
+  matchupFetching: false,
   error: null,
   sideVotes: null,
   matchup: null,
@@ -53,7 +56,9 @@ export const INITIAL_STATE = Immutable({
   createFetching: false,
   matchInviteList: null,
   voteFetching: false,
-  inviteListFetching:false
+  inviteListFetching:false,
+  searchFetching: false,
+  searchResults: []
 })
 
 /* ------------- Reducers ------------- */
@@ -76,6 +81,15 @@ export const getMyListSuccess = (state, action) => {
 }
 export const getMyListError = (state, action) => 
   state.merge({fetching: false, error: action.error })
+
+export const searchMatchupAttempt = (state, action) => {
+  return state.merge({searchTerm: action.searchTerm, searchFetching: true})
+}
+export const searchMatchupSuccess = (state, action) => {
+  return state.merge({searchFetching: false, searchResults: action.searchResults})
+}
+export const searchMatchupFailure = (state, action) => 
+  state.merge({searchFetching: false, error: action.error })
 
 export const myInviteAttempt = (state) =>state.merge({inviteListFetching: true})
 export const myInviteSuccess = (state, action) =>state.merge({inviteListFetching: false, invitedList: action.invitedList})
@@ -158,6 +172,9 @@ export const reducer = createReducer(INITIAL_STATE, {
   [Types.VOTE_ATTEMPT]: voteAttempt,
   [Types.VOTE_SUCCESS]: voteSuccess,
   [Types.VOTE_FAILURE]: voteFailure,
+  [Types.SEARCH_MATCHUP_ATTEMPT]: searchMatchupAttempt,
+  [Types.SEARCH_MATCHUP_SUCCESS]: searchMatchupSuccess,
+  [Types.SEARCH_MATCHUP_FAILURE]: searchMatchupFailure, 
   [Types.GET_MATCHUP_ATTEMPT]: getMatchupAttempt,
   [Types.GET_MATCHUP_SUCCESS]: getMatchupSuccess,
   [Types.GET_MATCHUP_FAILURE]: getMatchupFailure, 

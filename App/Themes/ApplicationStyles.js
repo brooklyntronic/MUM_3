@@ -53,6 +53,10 @@ const ApplicationStyles = {
     sliderWrapper: {
       height: Metrics.screenWidth + 40
     },
+    searchBar: {
+      backgroundColor: Colors.brand,
+      borderTopWidth: 0
+    },
     matchupSliderWrapper: {
       height: Metrics.screenWidth
     },
@@ -89,8 +93,7 @@ const ApplicationStyles = {
     overlayImage: {
       width: Metrics.screenWidth,
       height: Metrics.screenWidth,
-      borderRadius: 7,
-      alignItems:'center',justifyContent:'flex-end', marginBottom: 20, borderRadius: 10
+      alignItems:'center',justifyContent:'flex-end', marginBottom: 20
     },
     overlayText: {
       color: '#fff',

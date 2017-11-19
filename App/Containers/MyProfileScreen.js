@@ -8,6 +8,7 @@ import SocketChat from '../Components/SocketChat'
 import { List, ListItem } from 'react-native-elements'
 import Swiper from 'react-native-swiper'
 import Image from 'react-native-image-progress'
+import FastImage from 'react-native-fast-image'
 import ImagePicker from 'react-native-image-crop-picker'
 import Utilities from '../Services/Utilities'
 import { RNS3 } from 'react-native-aws3'
@@ -129,12 +130,12 @@ class MyProfileScreen extends Component {
     return (
       <ScrollView style={styles.mainScroll}>
       <View style={styles.centered}><Text style={styles.heading}>My Profile</Text></View>
-      {this.props.viewedPhoto ? <Image style={styles.fullImage} source={{uri: 'https://d23grucy15vpbj.cloudfront.net/' + this.props.viewedPhoto}}>
+      {this.props.viewedPhoto ? <View style={styles.centered}><FastImage style={styles.fullImage} source={{uri: 'https://d23grucy15vpbj.cloudfront.net/' + this.props.viewedPhoto}}>
             {!this.props.profile.avatar || this.props.viewedPhoto.indexOf(this.props.profile.avatar) < 0 ? 
               (<View style={styles.editAvatarContainer}>
                 <TouchableOpacity style={styles.editAvatar} onPress={()=>{this.makeAvatar(this.props.viewedPhoto)}}><Icon name='user-circle' size={40} style={{color: '#fff'}}/></TouchableOpacity>
                 <TouchableOpacity style={[styles.editAvatar, {marginLeft: 20}]} onPress={()=>{this.deletePhoto(this.props.viewedPhoto)}}><Icon style={styles.icons} name='trash-o' size={40} style={{color: '#fff'}} /></TouchableOpacity>
-                </View>):null}</Image> : null}
+                </View>):null}</FastImage></View> : null}
 
         {!this.props.photosUploading && this.props.profile && this.props.profile.photos.length > 0  ?
           <View style={styles.carouselWrapper}>
@@ -143,7 +144,7 @@ class MyProfileScreen extends Component {
             return (
               <View key={i}>
               <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
-              {photo.map((ind)=>(<TouchableOpacity key={ind} onPress={()=>{this.showImage(ind)}}><Image style={styles.carouselImage} source={{uri: 'https://d23grucy15vpbj.cloudfront.net/'+ ind}}/></TouchableOpacity>))}
+              {photo.map((ind)=>(<TouchableOpacity key={ind} onPress={()=>{this.showImage(ind)}}><FastImage style={styles.carouselImage} source={{uri: 'https://d23grucy15vpbj.cloudfront.net/'+ ind}}/></TouchableOpacity>))}
               </View>
               </View>
               )}

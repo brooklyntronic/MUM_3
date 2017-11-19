@@ -1,14 +1,16 @@
 import React, { Component } from 'react'
 import { ActivityIndicator, View, Text, Dimensions, TouchableOpacity, ScrollView, ImageBackground} from 'react-native'
 import Image from 'react-native-image-progress'
+import FastImage from 'react-native-fast-image'
 import { connect } from 'react-redux'
 import {Images, Colors} from '../Themes'
 import Addicon from '../Components/Addicon'
-import SearchBar from '../Components/SearchBar'
+import {SearchBar, List, ListItem} from 'react-native-elements'
 import PageHeader from '../Components/PageHeader'
 import FullButton from '../Components/FullButton'
 import RoundedButton from '../Components/RoundedButton'
 import Icon from 'react-native-vector-icons/FontAwesome'
+import debounce from 'debounce'
 // Styles
 import styles from './Styles/MatchupListScreenStyle'
 import Swiper from 'react-native-swiper'
@@ -21,8 +23,9 @@ class MatchupListScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      index: this.props.navigation.state.params? this.props.navigation.state.params.index : 0
+      index: this.props.navigation.state.params? this.props.navigation.state.params.index : 0, searchText: '', searching: false
     }
+    this.debounceSearch = debounce(this.props.searchMatchups, 3000)
   }
   alreadyVoted (matchup){
     // if (!this.props.sideVotes){
@@ -40,10 +43,20 @@ class MatchupListScreen extends Component {
         // this.props.getMyList()
       }
   }
+  searchMatchups(text){
+    this.setState(Object.assign({}, this.state, {searchText: text, searching: true}), ()=>{
+      this.debounceSearch(text, this.props.listShown);
+    })
+  }
   openMatchupScreen (matchid, vote, index, matchup){
     const voteParam = vote ? {vote: vote} : null
     this.props.openMatchup(matchup)
     this.props.navigation.navigate('MatchupScreen', {id: matchid, voteParam, fromList: this.props.listShown, index: index})
+  }
+  componentWillReceiveProps(nextProps){
+    if(this.props.searchFetching){
+      this.setState({searching: false})
+    }
   }
   toggleMatchups (val) {
     this.props.toggleMatchups(val)
@@ -66,17 +79,45 @@ class MatchupListScreen extends Component {
     }
     return (
       <ScrollView style={styles.mainScroll}>
-      <Addicon onPress={()=>this.props.navigation.navigate('MatchupCreateScreen')}/>
+      {<SearchBar
+        clearIcon
+        onClearText={()=>{this.setState(Object.assign({}, this.state, {searchText: ''}), ()=>{this.props.clearSearch()})}}
+        containerStyle = {styles.searchBar}
+        round
+        lightTheme
+        onChangeText={(text)=>{this.searchMatchups(text)}}
+        onClearText={()=>{this.setState(Object.assign({}, this.state, {searchText: ''}))}}
+        placeholder='Search Matchups...' />
+    }
+  <Addicon onPress={()=>this.props.navigation.navigate('MatchupCreateScreen')}/>
+        {this.props.searchFetching || this.state.searching  ? (<View style={styles.centered}><ActivityIndicator/></View>) : null}
+        {this.state.searchText && this.props.searchResults && !this.props.searchFetching && !this.state.searching ? (<View><View style={styles.centered}><Text style={styles.heading}>Search Results</Text></View>
+              {this.props.searching?<ActivityIndicator/>:null}
+              <List containerStyle={{borderTopWidth: 0}}>{this.props.searchResults.map((matchup, i)=>{
+                return (<ListItem
+                  key={matchup._id}
+                  onPress={()=>this.openMatchupScreen(matchup.prettyUrl, this.alreadyVoted(matchup._id), listShown.indexOf(matchup), matchup)}
+                  avatar={{ uri:'https://d23grucy15vpbj.cloudfront.net/merged/' + matchup.mergedImage }}
+                  roundAvatar
+                  avatarStyle={{height: 70, width: 70, borderRadius: 35}}
+                  avatarContainerStyle={{width: 70}}
+                  subtitle={`${matchup.category || 'Uncategorized'}`}
+                  titleStyle={styles.link}
+                  title={matchup.title}
+                  hideChevron
+                  containerStyle={{borderBottomWidth: 0, marginVertical: 10}}
+                  />)})}</List></View>):null}
       <View style = {styles.mainContainer}>
+
       <View style={styles.sliderWrapper}>
       {listShown.length > 0 ?<Swiper showsButtons={true} showsPagination={false} ref={component => this.swiper = component}>
             {listShown.map((matchup, i)=>{
               return( 
                 <TouchableOpacity key={matchup._id} onPress={()=>this.openMatchupScreen(matchup.prettyUrl, this.alreadyVoted(matchup._id), listShown.indexOf(matchup), matchup)} style={styles.centered} >
                 <Text style={styles.heading}>{matchup.title.toUpperCase()}</Text>
-                <Image  style={styles.overlayImage}   source={{uri:'https://d23grucy15vpbj.cloudfront.net/merged/' + matchup.mergedImage}}>
+                <FastImage  style={styles.overlayImage}   source={{uri:'https://d23grucy15vpbj.cloudfront.net/merged/' + matchup.mergedImage}}>
                 {this.alreadyVoted(matchup._id) ? <View style={styles.overlay}><Text style={styles.overlayText}>Already Voted {matchup.sides[this.alreadyVoted(matchup._id) - 1].name}</Text></View> : null}
-                </Image>
+                </FastImage>
                 </TouchableOpacity>
                 )
               })
@@ -107,6 +148,8 @@ const mapStateToProps = (state) => {
     publicMatchups: state.matchups.publicMatchups,
     index: state.matchups.index,
     loaded: state.matchups.matchupsLoaded && state.matchups.myMatchupsLoaded,
+    searchResults: state.matchups.searchResults,
+    searchFetching: state.matchups.searchFetching
     // isPublic: state.matchups.listShown ==='public'? true: false
   }
 }
@@ -124,6 +167,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     openMatchup: (matchup)=>{
       dispatch(MatchupActions.openMatchup(matchup))
+    },
+    searchMatchups: (searchTerm, myList) =>{
+      dispatch(MatchupActions.searchMatchupAttempt(searchTerm, myList))
     }
   }
 }

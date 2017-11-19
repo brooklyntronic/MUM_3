@@ -13,8 +13,8 @@ import { MatchupTypes } from '../Redux/MatchupRedux'
 import { MessagesTypes } from '../Redux/MessagesRedux'
 import { FileTypes } from '../Redux/FileRedux'
 /* ------------- Sagas ------------- */
-import { create_user, login, check_login, get_preferences, edit_preference, edit_location_preference, edit_location_profile, edit_my_profile, get_profile, get_my_profile, change_avatar, delete_photo, invite_to_matchup, create_preferences, create_profile, search_matches_preference, send_friend_request, send_friend_request_list, receive_friend_request, accept_friend_request, deny_friend_request, added_friend_request, unfriend, get_notifications, upload_photo } from './UserSagas'
-import { matchups, vote_matchup, get_matchup, create_matchup, get_votes, invited_matchups} from './MatchupSagas'
+import { create_user, login, check_login, get_preferences, edit_preference, edit_location_preference, edit_location_profile, edit_my_profile, get_profile, get_my_profile, change_avatar, delete_photo, invite_to_matchup, create_preferences, create_profile, search_matches_preference, search_matches, send_friend_request, send_friend_request_list, receive_friend_request, accept_friend_request, deny_friend_request, added_friend_request, unfriend, get_notifications, upload_photo } from './UserSagas'
+import { matchups, vote_matchup, get_matchup, create_matchup, get_votes, invited_matchups, search_matchup} from './MatchupSagas'
 import { get_all_messages, get_message_thread, post_message, delete_message_thread, save_messages, make_call, accept_call, receive_call, hang_call } from './MessagesSagas'
 /* ------------- API ------------- */
 
@@ -48,6 +48,7 @@ export default function * root () {
     takeLatest(UserTypes.PROFILE_CREATE_ATTEMPT, create_profile, api),
     takeLatest(UserTypes.PREFERENCES_CREATE_ATTEMPT, create_preferences, api),
     takeLatest(UserTypes.SEARCH_MATCHES_PREFERENCE_ATTEMPT, search_matches_preference, api),
+    takeLatest(UserTypes.SEARCH_MATCHES_ATTEMPT, search_matches, api),
     takeLatest(UserTypes.SEND_FRIEND_REQUEST_ATTEMPT, send_friend_request, api),
     takeLatest(UserTypes.SEND_FRIEND_REQUEST_LIST_ATTEMPT, send_friend_request_list, api),
     takeLatest(UserTypes.ACCEPT_FRIEND_REQUEST_ATTEMPT, accept_friend_request, api),
@@ -62,6 +63,7 @@ export default function * root () {
     takeLatest(MatchupTypes.VOTE_ATTEMPT, vote_matchup, api),
     takeLatest(MatchupTypes.GET_MATCHUP_ATTEMPT, get_matchup, api),
     takeLatest(MatchupTypes.CREATE_MATCHUP_ATTEMPT, create_matchup, api, s3),
+    takeLatest(MatchupTypes.SEARCH_MATCHUP_ATTEMPT, search_matchup, api),
     takeLatest(UserTypes.INVITE_TO_MATCHUP_ATTEMPT, invite_to_matchup, api),
 
     //Messages

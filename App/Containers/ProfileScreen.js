@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
-import Image from 'react-native-image-progress'
+import { createImageProgress }  from 'react-native-image-progress'
+import FastImage from 'react-native-fast-image'
+import * as Progress from 'react-native-progress'
 import { ScrollView, Text, AsyncStorage, View, ActivityIndicator, FlatList, TouchableOpacity, Alert} from 'react-native'
 import { connect } from 'react-redux'
 import FullButton from '../Components/FullButton'
@@ -132,7 +134,7 @@ class ProfileScreen extends Component {
         <Icon style={styles.icons} name='heart-o' size={40} /><Text style={styles.link}>Requested</Text>
         </TouchableOpacity>
         </View> : null}
-      <Image style={styles.fullImage} source={{uri:this.state.avatar?this.state.avatar : Utilities.getAvatar(this.props.user)}}/>      
+      <FastImage style={styles.fullImage} source={{uri:this.state.avatar?this.state.avatar : Utilities.getAvatar(this.props.user)}}/>      
       {this.props.user.photos.length > 0? <Text style={styles.pageHeading}>{this.props.user.name}'s Photos</Text>:null}
       <View>
       {this.props.user.photos.length > 0 ? <View style={styles.carouselWrapper}><Swiper showsButtons={true}  showsPagination={false}
@@ -141,7 +143,7 @@ class ProfileScreen extends Component {
         return (
           <View key={i}>
           <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
-          {photo.map((ind)=>(<TouchableOpacity key={ind} onPress={()=>{this.showImage(ind)}}><Image style={styles.carouselImage} source={{uri: 'https://d23grucy15vpbj.cloudfront.net/'+ ind}}/></TouchableOpacity>))}
+          {photo.map((ind)=>(<TouchableOpacity key={ind} onPress={()=>{this.showImage(ind)}}><FastImage style={styles.carouselImage} source={{uri: 'https://d23grucy15vpbj.cloudfront.net/'+ ind}}/></TouchableOpacity>))}
           </View>
           </View>
           )

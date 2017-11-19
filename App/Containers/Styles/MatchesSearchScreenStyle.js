@@ -29,7 +29,7 @@ export default StyleSheet.create({
   },
   image: {
     ...ApplicationStyles.screen.fullImage,
-    alignItems:'center',justifyContent:'flex-end', marginBottom: 20, borderRadius: 10
+    alignItems:'center',justifyContent:'flex-end', marginBottom: 20
   },
   paragraph: {
   	color: '#fff',

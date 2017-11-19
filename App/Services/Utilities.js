@@ -15,9 +15,9 @@ export default {
       return match.sex === 'female' ? 'https://d23grucy15vpbj.cloudfront.net/webImg/icons/user-female-icon.png' : 'https://d23grucy15vpbj.cloudfront.net/webImg/icons/user-male-icon.png';
     }
   },
-  pollTranscoder: (jobId, fn, interval) =>{
+  poll: (fn, interval) =>{
     var checkCondition = function(resolve, reject) { 
-        var ajax = fn(jobId);
+        var ajax = fn();
         ajax.then( function(response){
             if(response.status === 200) {
                 resolve(response);
@@ -33,8 +33,9 @@ export default {
 
     return new Promise(checkCondition);
   },
-  // baseUrl: Platform.OS === 'ios' ?  'http://192.168.0.10:3000/' : 'http://10.0.2.2:3000/',
-  baseUrl: 'https://safe-falls-71589.herokuapp.com/',
+
+  baseUrl: Platform.OS === 'ios' ?  'http://192.168.0.10:3000/' : 'http://10.0.2.2:3000/',
+  // baseUrl: 'https://safe-falls-71589.herokuapp.com/',
   matchupCategories: ['Film & Animation',
   'Cars & Vehicles',
   'Music',

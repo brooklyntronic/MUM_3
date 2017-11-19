@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import Image from 'react-native-image-progress'
+import FastImage from 'react-native-fast-image'
 import { View, Text, ActivityIndicator, ScrollView, AsyncStorage, Animated, TextInput, TouchableOpacity } from 'react-native'
 import { List, ListItem, SearchBar } from 'react-native-elements'
 import { connect } from 'react-redux'
@@ -88,7 +89,7 @@ class MatchupScreen extends Component {
         if (item.mediaType === 'pic'){
           return (
             <View style={styles.centered}  key={item.side}>
-            <Image source={{uri: 'https://d23grucy15vpbj.cloudfront.net/' + item.image}}  style={styles.fullImage}  />
+            <FastImage source={{uri: 'https://d23grucy15vpbj.cloudfront.net/' + item.image}}  style={styles.fullImage}  />
             {this.props.matchup.matchupType === 'Poll' || this.props.matchup.myVote  ? null : <FullButton onPress={this.vote(item.side)}  text={'Vote '+ item.name} />}
             </View>
             )
@@ -136,7 +137,7 @@ class MatchupScreen extends Component {
         this.props.matchup.sides.map((item)=>{
 
           if(item.mediaType === 'vid'){
-           return ( <View key={item.side}>
+           return ( <View style={styles.centered} key={item.side}>
                     <TouchableOpacity style={{position: 'absolute', top: '45%', left: '45%', zIndex:10}}><Icon name="play-circle" size={60} style={{color: 'white'}} onPress={()=>{this['player' + item.side].presentFullscreenPlayer()}}/></TouchableOpacity>
                        <Video source={{uri: `https://d2heqpumv6ps36.cloudfront.net/Converted/${item.mp4}`, mainVer: 1, patchVer: 0}} // Looks for .mp4 file (background.mp4) in the given expansion version.
                   rate={1.0}                   // 0 is paused, 1 is normal.
@@ -155,7 +156,7 @@ class MatchupScreen extends Component {
           if (item.mediaType === 'pic'){
             return (
               <View style={styles.centered}  key={item.side}>
-              <Image source={{uri: 'https://d23grucy15vpbj.cloudfront.net/' + item.image}}  style={styles.fullImage}  />
+              <FastImage source={{uri: 'https://d23grucy15vpbj.cloudfront.net/' + item.image}}  style={styles.fullImage}  />
               {!this.props.matchup.myVote && !this.props.voteFetching ? <View style={styles.padding}><FullButton onPress={()=>this.vote(item.side)}  text={'Vote '+ item.name} /></View> : this.props.matchup.myVote == item.side ? <View style={[styles.padding, styles.centered]}><Text style={styles.matchupHeading}>Voted for {this.props.matchup.sides[this.props.matchup.myVote - 1].name}</Text></View> :  <View style={[styles.padding, styles.centered]}><Text style={styles.matchupHeading}>{item.name}</Text></View>}
               {this.props.voteFetching? <View  style={styles.padding}><ActivityIndicator/></View>:null}
               </View>

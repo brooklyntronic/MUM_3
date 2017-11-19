@@ -88,11 +88,11 @@ export function * vote_matchup (api, action) {
   }
 }
 
-function pollTranscoder(jobId, api){
-  return Utilities.pollTranscoder(jobId, function() {
-    return api.pollTranscoder(jobId);
-  }, 3000)
-}
+// function pollTranscoder(jobId, api){
+//   return Utilities.pollTranscoder(jobId, function() {
+//     return api.pollTranscoder(jobId);
+//   }, 3000)
+// }
 
 export function * create_matchup (api, s3, action) {
   let hasError = false
@@ -118,7 +118,7 @@ export function * create_matchup (api, s3, action) {
     if(transcodeArray.length > 0){
       const pollArray = yield all(transcodeArray.map((transcode, i)=>{
         // Reactotron.log(call(pollTranscoder, transcode.data))
-        return call(pollTranscoder, transcode.data, api)
+        return call(api.pollTranscoder, transcode.data)
       }))
       if(pollArray.filter((poll)=>poll.status !== 200).length > 0){
 
@@ -203,4 +203,14 @@ export function * get_matchup (api, action) {
 
  }
 
+}
+
+export function * search_matchup (api, action) {
+  const response = yield call(api.searchMatchups, action.searchTerm, action.myList)
+
+  if (response.ok){
+    yield put(MatchupActions.searchMatchupSuccess(response.data))
+  } else {
+    yield put(MatchupActions.searchMatchupFailure('Error'))
+  }
 }

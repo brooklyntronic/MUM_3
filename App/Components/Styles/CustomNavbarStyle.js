@@ -14,7 +14,7 @@ export default StyleSheet.create({
 		paddingHorizontal: Metrics.baseMargin
 	},
 	navIcon: {
-		color: 'grey',
+		color: '#4c4c4c',
 		shadowOpacity: 0.75,
         shadowColor: '#000',
         shadowOffset: { height: 0, width: 0 }

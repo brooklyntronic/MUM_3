@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { ActivityIndicator, View, Text,Dimensions, TouchableOpacity, AsyncStorage, ScrollView } from 'react-native'
-import { List, ListItem } from 'react-native-elements'
+import { List, ListItem, SearchBar } from 'react-native-elements'
 import Image from 'react-native-image-progress'
 import { connect } from 'react-redux'
 import {Images} from '../Themes'
@@ -16,7 +16,7 @@ class MatchesScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLoading: true, matchups: [], sideVotes: []
+      isLoading: true, matchups: [], sideVotes: [], searchText: ''
     }
   }
   renderMatches (type) {
@@ -28,7 +28,7 @@ class MatchesScreen extends Component {
         <Text style={styles.heading}>{type==='matches'? 'Matches':'Requests'}</Text>
         </View>
         <List containerStyle={{borderTopWidth: 0}}>
-        {this.props[type].map((user, i)=>{
+        {this.props[type].filter((user)=>user.name.indexOf(this.state.searchText) > -1).map((user, i)=>{
           // Reactotron.log(user)
           return( 
             <ListItem
@@ -69,6 +69,14 @@ class MatchesScreen extends Component {
   //
   return (
     <ScrollView contentContainerStyle={styles.mainScroll}>
+    <SearchBar
+    containerStyle = {styles.searchBar}
+    round
+    lightTheme
+    value={this.state.searchText}
+  onChangeText={(text)=>{this.setState(Object.assign({}, this.state, {searchText: text}))}}
+  onClearText={()=>{}}
+  placeholder='Search My Matches...' />
     <View style={styles.container}>
     {this.renderMatches('requests') }
     {this.renderMatches('matches')}

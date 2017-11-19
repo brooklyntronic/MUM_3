@@ -52,6 +52,12 @@ const { Types, Creators } = createActions({
   profileSuccess: ['profileUser'],
   profileFailure: ['error'],
 
+  searchMatchesAttempt: ['searchTerm'],
+  searchMatchesSuccess: ['matchList'],
+  searchMatchesFailure: ['error'],
+  
+  clearSearch: null,
+
   searchMatchesPreferenceAttempt: null,
   searchMatchesPreferenceSuccess: ['matchList'],
   searchMatchesPreferenceFailure: ['error'],
@@ -152,7 +158,9 @@ export const INITIAL_STATE = Immutable({
   notifications: null,
   photosUploading: null,
   viewedPhoto: null,
-  friendRequestFetching: false
+  friendRequestFetching: false,
+  searchMatchesFetching: false,
+  requestedSearchResults: []
 })
 
 /* ------------- Reducers ------------- */
@@ -250,6 +258,12 @@ export const unfriendAttempt = (state)=>state
 export const unfriendSuccess = (state, action)=>state.merge({matchesList: action.matchesList})
 export const unfriendFailure = (state, action)=>state.merge({error: action.error})
 
+export const searchMatchesAttempt = (state, action) => state.merge({searchMatchesFetching: true, searchTerm: action.searchTerm})
+export const searchMatchesSuccess = (state, action) => state.merge({searchMatchesFetching: false, requestedSearchResults: action.matchList})
+export const searchMatchesFailure = (state, action) => state.merge({searchMatchesFetching: false, error: action.error})
+
+export const clearSearch = (state) => state.merge({searchTerm: ''})
+
 export const searchMatchesPreferenceAttempt = (state) => state.merge({searchMatchesPreferencesFetching: true})
 export const searchMatchesPreferenceSuccess = (state, action) => state.merge({searchMatchesPreferencesFetching: false, searchMatchesPreferences: action.matchList})
 export const searchMatchesPreferenceFailure = (state, action) => state.merge({searchMatchesPreferencesFetching: false, error: action.error})
@@ -339,6 +353,12 @@ export const reducer = createReducer(INITIAL_STATE, {
   [Types.SEARCH_MATCHES_PREFERENCE_ATTEMPT]:searchMatchesPreferenceAttempt,
   [Types.SEARCH_MATCHES_PREFERENCE_SUCCESS]:searchMatchesPreferenceSuccess,
   [Types.SEARCH_MATCHES_PREFERENCE_FAILURE]:searchMatchesPreferenceFailure,
+
+  [Types.SEARCH_MATCHES_ATTEMPT]:searchMatchesAttempt,
+  [Types.SEARCH_MATCHES_SUCCESS]:searchMatchesSuccess,
+  [Types.SEARCH_MATCHES_FAILURE]:searchMatchesFailure,
+
+  [Types.CLEAR_SEARCH]: clearSearch,
 
   [Types.SEARCH_MATCHES_VOTE_ATTEMPT]:searchMatchesVoteAttempt,
   [Types.SEARCH_MATCHES_VOTE_SUCCESS]:searchMatchesVoteSuccess,

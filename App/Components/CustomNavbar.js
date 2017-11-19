@@ -128,7 +128,7 @@ swipe(targetIndex) {
       <View style={styles.menuPart} key={1} >
       <TouchableOpacity onPress={()=>{this.props.homeNavigate()}} disabled={!this.props.complete}><Icon name='home' size={30} style={this.props.nav.routes[this.props.nav.routes.length - 1].routeName === 'AuthenticatedLaunchScreen' ? styles.navIconSelected : styles.navIcon}/></TouchableOpacity>
       <TouchableOpacity onPress={()=>{this.props.searchNavigate()}}  disabled={!this.props.complete}><Icon name='search' size={30} style={this.props.nav.routes[this.props.nav.routes.length - 1].routeName === 'MatchesSearchScreen' ? styles.navIconSelected : styles.navIcon}/></TouchableOpacity>
-      <TouchableOpacity onPress={this.props.matchesNavigate}  disabled={!this.props.complete}><Icon name='heart' size={30} color='red'/>
+      <TouchableOpacity onPress={this.props.matchesNavigate}  disabled={!this.props.complete}><Icon name='heart' size={30} style={this.props.nav.routes[this.props.nav.routes.length - 1].routeName === 'MatchesScreen' || this.props.nav.routes[this.props.nav.routes.length - 1].routeName === 'ProfileScreen' ? styles.navIconSelected : styles.navIcon}/>
       {this.props.requests && this.props.requests > 0 ? <View style={{position: 'absolute', right: -5}}><Badge containerStyle={{ backgroundColor: 'red', padding: 5, borderRadius:5}} value={this.props.requests} /></View>:null}
       </TouchableOpacity>
       <TouchableOpacity onPress={this.props.messagesNavigate}  disabled={!this.props.complete}><Icon name='envelope' size={30} style={this.props.nav.routes[this.props.nav.routes.length - 1].routeName === 'MessagesScreen' || this.props.nav.routes[this.props.nav.routes.length - 1].routeName === 'MessageScreen' ? styles.navIconSelected : styles.navIcon}/>
