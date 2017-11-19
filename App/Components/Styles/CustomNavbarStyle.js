@@ -14,16 +14,10 @@ export default StyleSheet.create({
 		paddingHorizontal: Metrics.baseMargin
 	},
 	navIcon: {
-		color: '#4c4c4c',
-		shadowOpacity: 0.75,
-        shadowColor: '#000',
-        shadowOffset: { height: 0, width: 0 }
+		color: '#19192f',
 	},
 	navIconSelected: {
-		color: '#add8e6',
-		shadowOpacity: 0.75,
-        shadowColor: '#000',
-        shadowOffset: { height: 0, width: 0 }
+		color: '#add8e6'
 	}
 	
 })

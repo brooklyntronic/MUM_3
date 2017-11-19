@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { ScrollView, Text, AsyncStorage, View, ActivityIndicator, Picker, TouchableOpacity, FlatList, Animated, TextInput} from 'react-native'
+import { ScrollView, Text, AsyncStorage, View, ActivityIndicator, Picker, TouchableOpacity, FlatList, Animated, TextInput, Switch} from 'react-native'
 import { connect } from 'react-redux'
 import {Images} from '../Themes/'
 import FullButton from '../Components/FullButton'
@@ -31,7 +31,7 @@ class MyProfileScreen extends Component {
       tempArray.push(this.props.profile.writtenAttributes[i])
     }
     let tempPhotos = [...this.props.profile.photos]
-    this.state = {preferences: null, fetching: true, editSwitch: false, index: 0, writtenAttributes: tempArray, editOpen: {}, pickerOpen: {}, picAttributes: this.props.profile.attributes, sex: this.props.profile.sex.value || null, noAvatar : this.props.profile.sex.value === 'female' ? 'https://d23grucy15vpbj.cloudfront.net/webImg/icons/user-female-icon.png' : 'https://d23grucy15vpbj.cloudfront.net/webImg/icons/user-male-icon.png', userId: this.props.me._id, photoSlides: this.makePhotos(tempPhotos), avatar: Utilities.getAvatar(this.props.me)}
+    this.state = {preferences: null, fetching: true, editSwitch: false, index: 0, writtenAttributes: tempArray, editOpen: {}, pickerOpen: {}, picAttributes: this.props.profile.attributes, sex: this.props.profile.sex.value || null, noAvatar : this.props.profile.sex.value === 'female' ? 'https://d23grucy15vpbj.cloudfront.net/webImg/icons/user-female-icon.png' : 'https://d23grucy15vpbj.cloudfront.net/webImg/icons/user-male-icon.png', userId: this.props.me._id, photoSlides: this.makePhotos(tempPhotos), avatar: Utilities.getAvatar(this.props.me), isPublic: this.props.profile.isPublic.value || false}
   }
 
   showEdit(index){
@@ -100,6 +100,11 @@ class MyProfileScreen extends Component {
   showImage(image) {
     this.props.viewPhoto(image)
   }
+  changeIsPublic(value){
+   let user = {isPublic: value}
+   this.props.saveItem(user);
+   this.setState({isPublic: value})
+  }
   uploadImage () {
     ImagePicker.openPicker({
       width: 500,
@@ -131,11 +136,11 @@ class MyProfileScreen extends Component {
       <ScrollView style={styles.mainScroll}>
       <View style={styles.centered}><Text style={styles.heading}>My Profile</Text></View>
       {this.props.viewedPhoto ? <View style={styles.centered}><FastImage style={styles.fullImage} source={{uri: 'https://d23grucy15vpbj.cloudfront.net/' + this.props.viewedPhoto}}>
-            {!this.props.profile.avatar || this.props.viewedPhoto.indexOf(this.props.profile.avatar) < 0 ? 
-              (<View style={styles.editAvatarContainer}>
-                <TouchableOpacity style={styles.editAvatar} onPress={()=>{this.makeAvatar(this.props.viewedPhoto)}}><Icon name='user-circle' size={40} style={{color: '#fff'}}/></TouchableOpacity>
-                <TouchableOpacity style={[styles.editAvatar, {marginLeft: 20}]} onPress={()=>{this.deletePhoto(this.props.viewedPhoto)}}><Icon style={styles.icons} name='trash-o' size={40} style={{color: '#fff'}} /></TouchableOpacity>
-                </View>):null}</FastImage></View> : null}
+      {!this.props.profile.avatar || this.props.viewedPhoto.indexOf(this.props.profile.avatar) < 0 ? 
+        (<View style={styles.editAvatarContainer}>
+          <TouchableOpacity style={styles.editAvatar} onPress={()=>{this.makeAvatar(this.props.viewedPhoto)}}><Icon name='user-circle' size={40} style={{color: '#fff'}}/></TouchableOpacity>
+          <TouchableOpacity style={[styles.editAvatar, {marginLeft: 20}]} onPress={()=>{this.deletePhoto(this.props.viewedPhoto)}}><Icon style={styles.icons} name='trash-o' size={40} style={{color: '#fff'}} /></TouchableOpacity>
+          </View>):null}</FastImage></View> : null}
 
         {!this.props.photosUploading && this.props.profile && this.props.profile.photos.length > 0  ?
           <View style={styles.carouselWrapper}>
@@ -184,7 +189,13 @@ class MyProfileScreen extends Component {
                 </View>
                 )
           })}
-           {!this.props.complete ? <Animatable.View animation="pulse" easing="ease-out" iterationCount="infinite" style={[styles.centered, styles.padding]}><TouchableOpacity onPress={()=>{this.props.navigation.navigate('PreferencesScreen')}}><Text style={styles.link}>Go to Preferences</Text></TouchableOpacity></Animatable.View>: null}
+          <Text style={[styles.link, {paddingLeft: 20}]}>Make Public</Text>
+          <Switch
+          style={{marginLeft: 20}}
+          onValueChange={(value) => {this.changeIsPublic(value)}}
+          value={this.state.isPublic}>
+          </Switch>
+          {!this.props.complete ? <Animatable.View animation="pulse" easing="ease-out" iterationCount="infinite" style={[styles.centered, styles.padding]}><TouchableOpacity onPress={()=>{this.props.navigation.navigate('PreferencesScreen')}}><Text style={styles.link}>Go to Preferences</Text></TouchableOpacity></Animatable.View>: null}
           </View>
           </View>
           </ScrollView>
